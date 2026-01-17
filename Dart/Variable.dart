@@ -11,11 +11,13 @@ Map<String, String> capitals = {
 };
 Set<String> fruits = {'apple', 'banana', 'orange'};
 
-var dynamicVariable = 'I can be anything';
-const pi = 3.14159;
-final currentTime = DateTime.now();
+var dynamicVariable =
+    'I can be anything'; // * I can assign any type of value either it is string,int, double etc.
+const pi = 3.14159; // *Constant variable assigned at compile time .
 
-// $ - It allows you to insert variables or expressions directly inside a string.
+final currentTime = DateTime.now(); // *Final variable assigned at runtime.
+
+// *$ - It allows you to insert variables or expressions directly inside a string.
 void main() {
   print('Integer: $x');
   print('Double: $y');
