@@ -7,20 +7,30 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:my_app/main.dart';
 
 void main() {
+  setUpAll(() async {
+    await Hive.initFlutter();
+    await Hive.openBox('todoBox');
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+  });
+
   testWidgets('Add task smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that initially there are no tasks.
-    expect(find.text('Add a task...'), findsOneWidget);
+    // Verify that the input field is present.
+    expect(find.byKey(const Key('taskField')), findsOneWidget);
 
     // Enter a task
     await tester.enterText(find.byKey(const Key('taskField')), 'Test task');
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.tap(find.text('Add'));
     await tester.pump();
 
     // Verify that the task is added.

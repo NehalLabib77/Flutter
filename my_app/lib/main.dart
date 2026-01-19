@@ -1,11 +1,15 @@
 // main.dart
-// Simple To-Do App with Date, Progress, and History
-// Author: Nehal Labib (customizable)
+// Advanced Todo App: Persistent Storage (Hive), Editable Table, Priority, Monthly Summary
+// Author: Nehal Labib
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  await Hive.openBox('todoBox');
   runApp(const MyApp());
 }
 
@@ -17,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Todo Progress App',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
       home: const TodoHomePage(),
     );
   }
@@ -33,55 +37,71 @@ class TodoHomePage extends StatefulWidget {
 class _TodoHomePageState extends State<TodoHomePage> {
   DateTime selectedDate = DateTime.now();
   final TextEditingController taskController = TextEditingController();
-
-  // date -> list of tasks
-  final Map<String, List<TodoItem>> tasksByDate = {};
+  final box = Hive.box('todoBox');
 
   String get dateKey => DateFormat('yyyy-MM-dd').format(selectedDate);
 
-  void addTask() {
-    if (taskController.text.trim().isEmpty) return;
+  List<Map<String, dynamic>> get tasks {
+    return List<Map<String, dynamic>>.from(box.get(dateKey, defaultValue: []));
+  }
 
-    tasksByDate.putIfAbsent(dateKey, () => []);
-    tasksByDate[dateKey]!.add(TodoItem(title: taskController.text));
-
-    taskController.clear();
+  void saveTasks(List<Map<String, dynamic>> updated) {
+    box.put(dateKey, updated);
     setState(() {});
   }
 
+  void addTask() {
+    if (taskController.text.trim().isEmpty) return;
+    final updated = tasks;
+    updated.add({
+      'title': taskController.text,
+      'done': false,
+      'priority': 'Medium',
+    });
+    taskController.clear();
+    saveTasks(updated);
+  }
+
   double get progress {
-    final tasks = tasksByDate[dateKey] ?? [];
     if (tasks.isEmpty) return 0;
-    final done = tasks.where((t) => t.isDone).length;
+    final done = tasks.where((t) => t['done'] == true).length;
     return done / tasks.length;
   }
 
-  Map<String, double> get historyProgress {
-    final Map<String, double> history = {};
+  Map<String, double> get monthlySummary {
+    final Map<String, List<Map<String, dynamic>>> grouped = {};
 
-    tasksByDate.forEach((date, tasks) {
+    for (var key in box.keys) {
+      final date = DateTime.parse(key);
+      final monthKey = DateFormat('yyyy-MM').format(date);
+      grouped.putIfAbsent(monthKey, () => []);
+      grouped[monthKey]!.addAll(List<Map<String, dynamic>>.from(box.get(key)));
+    }
+
+    final Map<String, double> summary = {};
+    grouped.forEach((month, tasks) {
       if (tasks.isEmpty) return;
-      final done = tasks.where((t) => t.isDone).length;
-      history[date] = done / tasks.length;
+      final done = tasks.where((t) => t['done'] == true).length;
+      summary[month] = done / tasks.length;
     });
 
-    return history;
+    return summary;
   }
 
   @override
   Widget build(BuildContext context) {
-    final tasks = tasksByDate[dateKey] ?? [];
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todo Progress App'),
+        title: const Text('Advanced Todo Tracker'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history),
+            icon: const Icon(Icons.bar_chart),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => HistoryPage(historyProgress)),
+                MaterialPageRoute(
+                  builder: (_) => MonthlySummaryPage(monthlySummary),
+                ),
               );
             },
           ),
@@ -90,43 +110,46 @@ class _TodoHomePageState extends State<TodoHomePage> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date Picker
-            Row(
-              children: [
-                Text(
-                  DateFormat('dd MMM yyyy').format(selectedDate),
-                  style: const TextStyle(fontSize: 18),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          DateFormat('dd MMM yyyy').format(selectedDate),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.calendar_today),
+                          onPressed: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: selectedDate,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2030),
+                            );
+                            if (picked != null) {
+                              setState(() => selectedDate = picked);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(value: progress),
+                    Text('Progress: ${(progress * 100).toStringAsFixed(0)}%'),
+                  ],
                 ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  onPressed: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) {
-                      setState(() => selectedDate = picked);
-                    }
-                  },
-                ),
-              ],
+              ),
             ),
-
-            const SizedBox(height: 12),
-
-            // Progress Bar
-            LinearProgressIndicator(value: progress),
-            const SizedBox(height: 6),
-            Text('Progress: ${(progress * 100).toStringAsFixed(0)}%'),
-
-            const Divider(height: 24),
-
-            // Task Input
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -134,37 +157,85 @@ class _TodoHomePageState extends State<TodoHomePage> {
                     key: const Key('taskField'),
                     controller: taskController,
                     decoration: const InputDecoration(
-                      hintText: 'Add a task...',
+                      labelText: 'New Task',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-                IconButton(icon: const Icon(Icons.add), onPressed: addTask),
+                const SizedBox(width: 8),
+                FilledButton(onPressed: addTask, child: const Text('Add')),
               ],
             ),
-
-            const SizedBox(height: 12),
-
-            // Task List
+            const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: tasks.length,
-                itemBuilder: (_, index) {
-                  final task = tasks[index];
-                  return CheckboxListTile(
-                    title: Text(
-                      task.title,
-                      style: TextStyle(
-                        decoration: task.isDone
-                            ? TextDecoration.lineThrough
-                            : null,
-                      ),
-                    ),
-                    value: task.isDone,
-                    onChanged: (val) {
-                      setState(() => task.isDone = val ?? false);
-                    },
-                  );
-                },
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: const [
+                    DataColumn(label: Text('Done')),
+                    DataColumn(label: Text('Task')),
+                    DataColumn(label: Text('Priority')),
+                    DataColumn(label: Text('Delete')),
+                  ],
+                  rows: List.generate(tasks.length, (index) {
+                    final task = tasks[index];
+                    return DataRow(
+                      cells: [
+                        DataCell(
+                          Checkbox(
+                            value: task['done'],
+                            onChanged: (val) {
+                              final updated = tasks;
+                              updated[index]['done'] = val;
+                              saveTasks(updated);
+                            },
+                          ),
+                        ),
+                        DataCell(
+                          TextFormField(
+                            initialValue: task['title'],
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                            ),
+                            onFieldSubmitted: (val) {
+                              final updated = tasks;
+                              updated[index]['title'] = val;
+                              saveTasks(updated);
+                            },
+                          ),
+                        ),
+                        DataCell(
+                          DropdownButton<String>(
+                            value: task['priority'],
+                            items: ['Low', 'Medium', 'High']
+                                .map(
+                                  (p) => DropdownMenuItem(
+                                    value: p,
+                                    child: Text(p),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (val) {
+                              final updated = tasks;
+                              updated[index]['priority'] = val;
+                              saveTasks(updated);
+                            },
+                          ),
+                        ),
+                        DataCell(
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              final updated = tasks;
+                              updated.removeAt(index);
+                              saveTasks(updated);
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
               ),
             ),
           ],
@@ -174,29 +245,19 @@ class _TodoHomePageState extends State<TodoHomePage> {
   }
 }
 
-class TodoItem {
-  final String title;
-  bool isDone;
-
-  TodoItem({required this.title, this.isDone = false});
-}
-
-class HistoryPage extends StatelessWidget {
-  final Map<String, double> history;
-
-  const HistoryPage(this.history, {super.key});
+class MonthlySummaryPage extends StatelessWidget {
+  final Map<String, double> summary;
+  const MonthlySummaryPage(this.summary, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('History')),
+      appBar: AppBar(title: const Text('Monthly Summary')),
       body: ListView(
-        children: history.entries.map((entry) {
+        children: summary.entries.map((e) {
           return ListTile(
-            title: Text(entry.key),
-            trailing: Text(
-              '${(entry.value * 100).toStringAsFixed(0)}% completed',
-            ),
+            title: Text(e.key),
+            trailing: Text('${(e.value * 100).toStringAsFixed(0)}%'),
           );
         }).toList(),
       ),
