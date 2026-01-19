@@ -8,11 +8,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mockito/mockito.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'package:my_app/main.dart';
 
+// Mock PathProviderPlatform
+class MockPathProviderPlatform extends Mock
+    with MockPlatformInterfaceMixin
+    implements PathProviderPlatform {
+  @override
+  Future<String?> getApplicationDocumentsPath() async {
+    return 'test_path';
+  }
+}
+
 void main() {
   setUpAll(() async {
+    // Mock path provider
+    PathProviderPlatform.instance = MockPathProviderPlatform();
     await Hive.initFlutter();
     await Hive.openBox('todoBox');
   });
@@ -24,6 +39,7 @@ void main() {
   testWidgets('Add task smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
+    await tester.pump(); // Ensure ValueListenableBuilder builds
 
     // Verify that the input field is present.
     expect(find.byKey(const Key('taskField')), findsOneWidget);

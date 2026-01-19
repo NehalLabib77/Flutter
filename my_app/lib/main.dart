@@ -42,24 +42,29 @@ class _TodoHomePageState extends State<TodoHomePage> {
   String get dateKey => DateFormat('yyyy-MM-dd').format(selectedDate);
 
   List<Map<String, dynamic>> get tasks {
-    return List<Map<String, dynamic>>.from(box.get(dateKey, defaultValue: []));
+    final raw = box.get(dateKey, defaultValue: <Map<String, dynamic>>[]);
+    return List<Map<String, dynamic>>.from(
+      raw.map((e) => Map<String, dynamic>.from(e)),
+    );
   }
 
-  void saveTasks(List<Map<String, dynamic>> updated) {
-    box.put(dateKey, updated);
-    setState(() {});
+  Future<void> saveTasks(List<Map<String, dynamic>> updated) async {
+    await box.put(dateKey, updated);
+    // No setState needed with ValueListenableBuilder
   }
 
-  void addTask() {
+  Future<void> addTask() async {
     if (taskController.text.trim().isEmpty) return;
+
     final updated = tasks;
     updated.add({
       'title': taskController.text,
       'done': false,
       'priority': 'Medium',
     });
+
     taskController.clear();
-    saveTasks(updated);
+    await saveTasks(updated);
   }
 
   double get progress {
@@ -74,8 +79,14 @@ class _TodoHomePageState extends State<TodoHomePage> {
     for (var key in box.keys) {
       final date = DateTime.parse(key);
       final monthKey = DateFormat('yyyy-MM').format(date);
+
       grouped.putIfAbsent(monthKey, () => []);
-      grouped[monthKey]!.addAll(List<Map<String, dynamic>>.from(box.get(key)));
+      final raw = box.get(key, defaultValue: <Map<String, dynamic>>[]);
+      grouped[monthKey]!.addAll(
+        List<Map<String, dynamic>>.from(
+          raw.map((e) => Map<String, dynamic>.from(e)),
+        ),
+      );
     }
 
     final Map<String, double> summary = {};
@@ -107,139 +118,158 @@ class _TodoHomePageState extends State<TodoHomePage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Row(
+      body: ValueListenableBuilder(
+        valueListenable: box.listenable(),
+        builder: (context, Box box, _) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                /// HEADER CARD
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
                       children: [
-                        Text(
-                          DateFormat('dd MMM yyyy').format(selectedDate),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              DateFormat('dd MMM yyyy').format(selectedDate),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Spacer(),
+                            IconButton(
+                              icon: const Icon(Icons.calendar_today),
+                              onPressed: () async {
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: selectedDate,
+                                  firstDate: DateTime(2020),
+                                  lastDate: DateTime(2030),
+                                );
+                                if (picked != null) {
+                                  setState(() => selectedDate = picked);
+                                }
+                              },
+                            ),
+                          ],
                         ),
-                        const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.calendar_today),
-                          onPressed: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: selectedDate,
-                              firstDate: DateTime(2020),
-                              lastDate: DateTime(2030),
-                            );
-                            if (picked != null) {
-                              setState(() => selectedDate = picked);
-                            }
-                          },
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(value: progress),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Progress: ${(progress * 100).toStringAsFixed(0)}%',
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 8),
-                    LinearProgressIndicator(value: progress),
-                    Text('Progress: ${(progress * 100).toStringAsFixed(0)}%'),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    key: const Key('taskField'),
-                    controller: taskController,
-                    decoration: const InputDecoration(
-                      labelText: 'New Task',
-                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                FilledButton(onPressed: addTask, child: const Text('Add')),
+
+                const SizedBox(height: 16),
+
+                /// ADD TASK ROW
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: taskController,
+                        decoration: const InputDecoration(
+                          labelText: 'New Task',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton(onPressed: addTask, child: const Text('Add')),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                /// TASK TABLE
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(label: Text('Done')),
+                        DataColumn(label: Text('Task')),
+                        DataColumn(label: Text('Priority')),
+                        DataColumn(label: Text('Delete')),
+                      ],
+                      rows: List.generate(tasks.length, (index) {
+                        final task = tasks[index];
+
+                        return DataRow(
+                          cells: [
+                            DataCell(
+                              Checkbox(
+                                value: task['done'],
+                                onChanged: (val) async {
+                                  final updated = tasks;
+                                  updated[index]['done'] = val;
+                                  await saveTasks(updated);
+                                },
+                              ),
+                            ),
+                            DataCell(
+                              TextFormField(
+                                initialValue: task['title'],
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                ),
+                                onFieldSubmitted: (val) async {
+                                  final updated = tasks;
+                                  updated[index]['title'] = val;
+                                  await saveTasks(updated);
+                                },
+                              ),
+                            ),
+                            DataCell(
+                              DropdownButton<String>(
+                                value: task['priority'],
+                                underline: const SizedBox(),
+                                items: ['Low', 'Medium', 'High']
+                                    .map(
+                                      (p) => DropdownMenuItem(
+                                        value: p,
+                                        child: Text(p),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (val) async {
+                                  final updated = tasks;
+                                  updated[index]['priority'] = val;
+                                  await saveTasks(updated);
+                                },
+                              ),
+                            ),
+                            DataCell(
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () async {
+                                  final updated = tasks;
+                                  updated.removeAt(index);
+                                  await saveTasks(updated);
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                    ),
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Done')),
-                    DataColumn(label: Text('Task')),
-                    DataColumn(label: Text('Priority')),
-                    DataColumn(label: Text('Delete')),
-                  ],
-                  rows: List.generate(tasks.length, (index) {
-                    final task = tasks[index];
-                    return DataRow(
-                      cells: [
-                        DataCell(
-                          Checkbox(
-                            value: task['done'],
-                            onChanged: (val) {
-                              final updated = tasks;
-                              updated[index]['done'] = val;
-                              saveTasks(updated);
-                            },
-                          ),
-                        ),
-                        DataCell(
-                          TextFormField(
-                            initialValue: task['title'],
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                            ),
-                            onFieldSubmitted: (val) {
-                              final updated = tasks;
-                              updated[index]['title'] = val;
-                              saveTasks(updated);
-                            },
-                          ),
-                        ),
-                        DataCell(
-                          DropdownButton<String>(
-                            value: task['priority'],
-                            items: ['Low', 'Medium', 'High']
-                                .map(
-                                  (p) => DropdownMenuItem(
-                                    value: p,
-                                    child: Text(p),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (val) {
-                              final updated = tasks;
-                              updated[index]['priority'] = val;
-                              saveTasks(updated);
-                            },
-                          ),
-                        ),
-                        DataCell(
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              final updated = tasks;
-                              updated.removeAt(index);
-                              saveTasks(updated);
-                            },
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
-                ),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
