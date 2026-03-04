@@ -4,7 +4,7 @@ import '../providers/savings_provider.dart';
 import '../utils/currency.dart';
 
 class AddSavingsScreen extends StatefulWidget {
-  const AddSavingsScreen({Key? key}) : super(key: key);
+  const AddSavingsScreen({super.key});
 
   @override
   State<AddSavingsScreen> createState() => _AddSavingsScreenState();

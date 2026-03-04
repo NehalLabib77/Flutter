@@ -65,10 +65,12 @@ class SavingsProvider extends ChangeNotifier {
     await Hive.initFlutter();
 
     // Register adapters (safe on hot reload)
-    if (!Hive.isAdapterRegistered(0))
+    if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(SavingsEntryAdapter());
-    if (!Hive.isAdapterRegistered(1))
+    }
+    if (!Hive.isAdapterRegistered(1)) {
       Hive.registerAdapter(SavingsTargetAdapter());
+    }
 
     _savingsBox = await Hive.openBox<SavingsEntry>('savings');
     _targetBox = await Hive.openBox<SavingsTarget>('targets');

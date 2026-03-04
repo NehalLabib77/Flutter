@@ -4,7 +4,7 @@ import '../providers/savings_provider.dart';
 import '../utils/currency.dart';
 
 class TargetSetupScreen extends StatefulWidget {
-  const TargetSetupScreen({Key? key}) : super(key: key);
+  const TargetSetupScreen({super.key});
 
   @override
   State<TargetSetupScreen> createState() => _TargetSetupScreenState();
