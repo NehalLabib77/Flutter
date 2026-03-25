@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../widgets/gradient_app_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../constants/app_colors.dart';
 import '../../providers/system_admin_provider.dart';
 
 class CreateHallScreen extends ConsumerStatefulWidget {
@@ -13,69 +13,86 @@ class CreateHallScreen extends ConsumerStatefulWidget {
 
 class _CreateHallScreenState extends ConsumerState<CreateHallScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
-  final _locationCtrl = TextEditingController();
-  String _hallType = 'Male';
+  final _name = TextEditingController();
+  final _type = TextEditingController(text: 'Male');
+  final _capacity = TextEditingController();
+  final _location = TextEditingController();
   bool _loading = false;
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
-    _locationCtrl.dispose();
+    _name.dispose();
+    _type.dispose();
+    _capacity.dispose();
+    _location.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Hall')),
+      appBar: const GradientAppBar(title: 'Create Hall'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
-                controller: _nameCtrl,
+                controller: _name,
                 decoration: const InputDecoration(
-                  labelText: 'Hall Name *',
-                  hintText: 'e.g. Bijoy-24 Hall',
-                  prefixIcon: Icon(Icons.apartment),
+                  labelText: 'Hall Name',
+                  prefixIcon: Icon(Icons.apartment_rounded),
                 ),
-                validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _hallType,
+                initialValue: 'Male',
                 decoration: const InputDecoration(
-                  labelText: 'Hall Type *',
-                  prefixIcon: Icon(Icons.wc),
+                  labelText: 'Hall Type',
+                  prefixIcon: Icon(Icons.category_rounded),
                 ),
-                items: ['Male', 'Female']
-                    .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                items: ['Male', 'Female', 'Mixed']
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                     .toList(),
-                onChanged: (v) => setState(() => _hallType = v ?? 'Male'),
+                onChanged: (v) => _type.text = v ?? 'Male',
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _locationCtrl,
+                controller: _capacity,
+                decoration: const InputDecoration(
+                  labelText: 'Capacity',
+                  prefixIcon: Icon(Icons.people_rounded),
+                ),
+                keyboardType: TextInputType.number,
+                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _location,
                 decoration: const InputDecoration(
                   labelText: 'Location',
-                  prefixIcon: Icon(Icons.location_on),
+                  prefixIcon: Icon(Icons.location_on_rounded),
                 ),
-                maxLines: 2,
               ),
               const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _loading ? null : _submit,
-                child: _loading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Create Hall'),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: FilledButton(
+                  onPressed: _loading ? null : _submit,
+                  child: _loading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Create Hall'),
+                ),
               ),
             ],
           ),
@@ -87,26 +104,22 @@ class _CreateHallScreenState extends ConsumerState<CreateHallScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-    try {
-      await ref.read(sysAdminHallsProvider.notifier).create({
-        'hallName': _nameCtrl.text.trim(),
-        'hallType': _hallType,
-        'location': _locationCtrl.text.trim(),
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Hall created successfully')),
-        );
-        context.pop();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
+
+    final data = {
+      'hallName': _name.text.trim(),
+      'hallType': _type.text.trim(),
+      'hallCapacity': int.tryParse(_capacity.text.trim()) ?? 0,
+      'location': _location.text.trim(),
+    };
+
+    final ok = await ref.read(sysAdminHallsProvider.notifier).create(data);
+    setState(() => _loading = false);
+
+    if (ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Hall created successfully')),
+      );
+      context.pop();
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
@@ -59,6 +60,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await StorageService.saveUser(user);
       state = AuthState(status: AuthStatus.authenticated, user: user);
     } catch (e) {
+      // Fall back to mock login when backend is unavailable
+      if (_isNetworkUnavailable(e)) {
+        final mockUser = _mockStudentLogin(username, password);
+        if (mockUser != null) {
+          await StorageService.saveToken(mockUser.token);
+          await StorageService.saveUser(mockUser);
+          state = AuthState(status: AuthStatus.authenticated, user: mockUser);
+          return;
+        }
+      }
       state = AuthState(
         status: AuthStatus.error,
         errorMessage: _getErrorMessage(e),
@@ -75,6 +86,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await StorageService.saveUser(user);
       state = AuthState(status: AuthStatus.authenticated, user: user);
     } catch (e) {
+      // Fall back to mock login when backend is unavailable
+      if (_isNetworkUnavailable(e)) {
+        final mockUser = _mockAdminLogin(username, password, role);
+        if (mockUser != null) {
+          await StorageService.saveToken(mockUser.token);
+          await StorageService.saveUser(mockUser);
+          state = AuthState(status: AuthStatus.authenticated, user: mockUser);
+          return;
+        }
+      }
       state = AuthState(
         status: AuthStatus.error,
         errorMessage: _getErrorMessage(e),
@@ -106,10 +127,69 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   String _getErrorMessage(dynamic e) {
-    if (e is Exception) {
-      return 'Invalid credentials. Please try again.';
+    if (e is DioException) {
+      if (_isNetworkUnavailable(e)) {
+        return 'Cannot reach server. Check your network or backend.';
+      }
+      final status = e.response?.statusCode;
+      if (status == 401 || status == 400) {
+        return 'Invalid username or password.';
+      }
+      return 'Server error ($status). Please try again.';
     }
-    return 'An error occurred. Please try again.';
+    return 'Invalid username or password.';
+  }
+
+  bool _isNetworkUnavailable(dynamic e) {
+    if (e is DioException) {
+      return e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout;
+    }
+    return false;
+  }
+
+  // Mock credentials used when backend is not running
+  AuthUser? _mockStudentLogin(String username, String password) {
+    if (username == 'student' && password == 'student123') {
+      return AuthUser(
+        userId: 'mock-student-001',
+        username: 'student',
+        role: 'Student',
+        studentId: 'STU001',
+        name: 'Demo Student',
+        token: 'mock-token-student',
+      );
+    }
+    return null;
+  }
+
+  AuthUser? _mockAdminLogin(String username, String password, String role) {
+    if (role == 'HallAdmin' &&
+        username == 'HallAdmin' &&
+        password == 'admin123') {
+      return AuthUser(
+        userId: 'mock-halladmin-001',
+        username: 'HallAdmin',
+        role: 'HallAdmin',
+        hallId: 1,
+        name: 'Demo Hall Admin',
+        token: 'mock-token-halladmin',
+      );
+    }
+    if (role == 'SystemAdmin' &&
+        username == 'System' &&
+        password == 'admin123') {
+      return AuthUser(
+        userId: 'mock-sysadmin-001',
+        username: 'System',
+        role: 'SystemAdmin',
+        name: 'Demo System Admin',
+        token: 'mock-token-sysadmin',
+      );
+    }
+    return null;
   }
 }
 

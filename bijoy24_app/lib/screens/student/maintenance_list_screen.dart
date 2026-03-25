@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../providers/student_provider.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/empty_state_widget.dart';
@@ -29,7 +30,7 @@ class _MaintenanceListScreenState extends ConsumerState<MaintenanceListScreen> {
     final state = ref.watch(studentMaintenanceProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Maintenance Requests')),
+      appBar: const GradientAppBar(title: 'My Maintenance Requests'),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/student/submit-maintenance'),
         child: const Icon(Icons.add),
@@ -41,11 +42,8 @@ class _MaintenanceListScreenState extends ConsumerState<MaintenanceListScreen> {
               icon: Icons.build_circle_outlined,
               title: 'No Maintenance Requests',
               subtitle: 'You haven\'t submitted any maintenance requests yet.',
-              action: ElevatedButton.icon(
-                icon: const Icon(Icons.add),
-                label: const Text('Report Issue'),
-                onPressed: () => context.push('/student/submit-maintenance'),
-              ),
+              actionLabel: 'Report Issue',
+              onAction: () => context.push('/student/submit-maintenance'),
             );
           }
           return RefreshIndicator(

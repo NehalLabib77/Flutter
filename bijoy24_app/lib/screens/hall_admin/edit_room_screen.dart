@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../widgets/gradient_app_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../constants/app_colors.dart';
 import '../../providers/hall_admin_provider.dart';
 import '../../widgets/loading_widget.dart';
 
@@ -15,152 +15,153 @@ class EditRoomScreen extends ConsumerStatefulWidget {
 
 class _EditRoomScreenState extends ConsumerState<EditRoomScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
-  final _wingCtrl = TextEditingController();
-  final _blockCtrl = TextEditingController();
-  final _floorCtrl = TextEditingController();
-  final _capacityCtrl = TextEditingController();
+  final _roomName = TextEditingController();
+  final _capacity = TextEditingController();
+  final _wing = TextEditingController();
+  final _block = TextEditingController();
+  final _floor = TextEditingController();
   String _status = 'Available';
   bool _loading = false;
   bool _initialized = false;
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
-    _wingCtrl.dispose();
-    _blockCtrl.dispose();
-    _floorCtrl.dispose();
-    _capacityCtrl.dispose();
+    _roomName.dispose();
+    _capacity.dispose();
+    _wing.dispose();
+    _block.dispose();
+    _floor.dispose();
     super.dispose();
   }
 
-  void _initFields(dynamic room) {
-    if (_initialized) return;
-    _initialized = true;
-    _nameCtrl.text = room.roomName ?? '';
-    _wingCtrl.text = room.wing ?? '';
-    _blockCtrl.text = room.block ?? '';
-    _floorCtrl.text = (room.floor ?? '').toString();
-    _capacityCtrl.text = room.roomCapacity.toString();
-    _status = room.status ?? 'Available';
+  void _initFromRoom() {
+    final rooms = ref.read(hallAdminRoomsProvider);
+    rooms.whenData((list) {
+      final room = list.cast().firstWhere(
+        (r) => r.roomId == widget.roomId.toString(),
+        orElse: () => null,
+      );
+      if (room != null && !_initialized) {
+        _roomName.text = room.roomName ?? '';
+        _capacity.text = '${room.roomCapacity}';
+        _wing.text = room.wing ?? '';
+        _block.text = room.block ?? '';
+        _floor.text = room.floor != null ? '${room.floor}' : '';
+        _status = room.status;
+        _initialized = true;
+        if (mounted) setState(() {});
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(hallAdminRoomsProvider.notifier).fetch();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(hallAdminRoomsProvider);
 
+    // Try to init when data is available
+    state.whenData((_) => _initFromRoom());
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Room')),
+      appBar: const GradientAppBar(title: 'Edit Room'),
       body: state.when(
-        data: (rooms) {
-          final room = rooms.firstWhere(
-            (r) => r.roomId == widget.roomId.toString(),
-            orElse: () => rooms.first,
-          );
-          _initFields(room);
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Room ${room.roomNumber}',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+        loading: () => const LoadingWidget(),
+        error: (_, _) => ErrorRetryWidget(
+          message: 'Failed to load room data',
+          onRetry: () => ref.read(hallAdminRoomsProvider.notifier).fetch(),
+        ),
+        data: (_) => SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _roomName,
+                  decoration: const InputDecoration(
+                    labelText: 'Room Name',
+                    prefixIcon: Icon(Icons.meeting_room_rounded),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _capacity,
+                  decoration: const InputDecoration(
+                    labelText: 'Capacity',
+                    prefixIcon: Icon(Icons.people_rounded),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _wing,
+                        decoration: const InputDecoration(labelText: 'Wing'),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _nameCtrl,
-                    decoration: const InputDecoration(labelText: 'Room Name'),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _wingCtrl,
-                          decoration: const InputDecoration(labelText: 'Wing'),
-                        ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _block,
+                        decoration: const InputDecoration(labelText: 'Block'),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _blockCtrl,
-                          decoration: const InputDecoration(labelText: 'Block'),
-                        ),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _floor,
+                  decoration: const InputDecoration(
+                    labelText: 'Floor',
+                    prefixIcon: Icon(Icons.layers_rounded),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _floorCtrl,
-                          decoration: const InputDecoration(labelText: 'Floor'),
-                          keyboardType: TextInputType.number,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _capacityCtrl,
-                          decoration: const InputDecoration(
-                            labelText: 'Capacity *',
-                          ),
-                          keyboardType: TextInputType.number,
-                          validator: (v) {
-                            if (v == null || v.isEmpty) return 'Required';
-                            final n = int.tryParse(v);
-                            if (n == null || n < 1 || n > 8) {
-                              return '1-8 seats';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ],
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  initialValue: _status,
+                  decoration: const InputDecoration(
+                    labelText: 'Status',
+                    prefixIcon: Icon(Icons.info_outline_rounded),
                   ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: _status,
-                    decoration: const InputDecoration(labelText: 'Status'),
-                    items: ['Available', 'Full', 'Maintenance']
-                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                        .toList(),
-                    onChanged: (v) => setState(() => _status = v ?? _status),
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
+                  items: ['Available', 'Full', 'Maintenance']
+                      .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setState(() => _status = v);
+                  },
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: FilledButton(
                     onPressed: _loading ? null : _submit,
                     child: _loading
                         ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
                           )
                         : const Text('Save Changes'),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        },
-        loading: () => const LoadingWidget(),
-        error: (_, __) => ErrorRetryWidget(
-          message: 'Failed to load room details',
-          onRetry: () => ref.read(hallAdminRoomsProvider.notifier).fetch(),
+          ),
         ),
       ),
     );
@@ -169,31 +170,26 @@ class _EditRoomScreenState extends ConsumerState<EditRoomScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-    try {
-      await ref
-          .read(hallAdminRoomsProvider.notifier)
-          .update(widget.roomId.toString(), {
-            'roomName': _nameCtrl.text.trim(),
-            'wing': _wingCtrl.text.trim(),
-            'block': _blockCtrl.text.trim(),
-            'floor': int.tryParse(_floorCtrl.text.trim()),
-            'roomCapacity': int.parse(_capacityCtrl.text.trim()),
-            'status': _status,
-          });
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Room updated successfully')));
-        context.pop();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
+
+    final data = {
+      'roomName': _roomName.text.trim(),
+      'roomCapacity': int.tryParse(_capacity.text.trim()) ?? 4,
+      'wing': _wing.text.trim(),
+      'block': _block.text.trim(),
+      'floor': int.tryParse(_floor.text.trim()),
+      'status': _status,
+    };
+
+    final ok = await ref
+        .read(hallAdminRoomsProvider.notifier)
+        .update(widget.roomId.toString(), data);
+    setState(() => _loading = false);
+
+    if (ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Room updated successfully')),
+      );
+      context.pop();
     }
   }
 }

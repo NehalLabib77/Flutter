@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/hall_provider.dart';
@@ -123,7 +124,7 @@ class _StudentRegistrationScreenState
     final hallsState = ref.watch(hallListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.studentRegistration)),
+      appBar: const GradientAppBar(title: AppStrings.studentRegistration),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -157,7 +158,7 @@ class _StudentRegistrationScreenState
 
               // Blood Group
               DropdownButtonFormField<String>(
-                value: _bloodGroup,
+                initialValue: _bloodGroup,
                 decoration: const InputDecoration(
                   labelText: AppStrings.bloodGroup,
                 ),
@@ -170,7 +171,7 @@ class _StudentRegistrationScreenState
 
               // Faculty
               DropdownButtonFormField<String>(
-                value: _faculty,
+                initialValue: _faculty,
                 decoration: const InputDecoration(
                   labelText: AppStrings.faculty,
                 ),
@@ -184,7 +185,7 @@ class _StudentRegistrationScreenState
 
               // Semester
               DropdownButtonFormField<int>(
-                value: _semester,
+                initialValue: _semester,
                 decoration: const InputDecoration(
                   labelText: AppStrings.semester,
                 ),
@@ -217,7 +218,7 @@ class _StudentRegistrationScreenState
 
               // Religion
               DropdownButtonFormField<String>(
-                value: _religion,
+                initialValue: _religion,
                 decoration: const InputDecoration(
                   labelText: AppStrings.religion,
                 ),
@@ -246,7 +247,7 @@ class _StudentRegistrationScreenState
                       .where((h) => h.hallType == _gender)
                       .toList();
                   return DropdownButtonFormField<int>(
-                    value: _selectedHallId,
+                    initialValue: _selectedHallId,
                     decoration: const InputDecoration(labelText: 'Select Hall'),
                     validator: (v) => v == null ? 'Please select a hall' : null,
                     items: filtered
@@ -334,8 +335,9 @@ class _StudentRegistrationScreenState
         decoration: InputDecoration(labelText: label),
         validator: (v) {
           if (v?.isEmpty == true) return AppStrings.errorRequired;
-          if (v != null && v.length < 6)
+          if (v != null && v.length < 6) {
             return AppStrings.errorPasswordTooShort;
+          }
           if (matchController != null && v != matchController.text) {
             return AppStrings.errorPasswordMismatch;
           }

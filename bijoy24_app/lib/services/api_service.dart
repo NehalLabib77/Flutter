@@ -7,13 +7,14 @@ class ApiService {
   factory ApiService() => _instance;
 
   late final Dio _dio;
+  String? _cachedToken;
 
   ApiService._internal() {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiEndpoints.baseUrl,
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
+        connectTimeout: const Duration(seconds: 3),
+        receiveTimeout: const Duration(seconds: 5),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -24,14 +25,15 @@ class ApiService {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await StorageService.getToken();
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
+          _cachedToken ??= await StorageService.getToken();
+          if (_cachedToken != null) {
+            options.headers['Authorization'] = 'Bearer $_cachedToken';
           }
           handler.next(options);
         },
         onError: (error, handler) {
           if (error.response?.statusCode == 401) {
+            _cachedToken = null;
             StorageService.clearAll();
           }
           handler.next(error);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../providers/student_provider.dart';
 import '../../providers/hall_provider.dart';
 import '../../widgets/status_badge.dart';
@@ -79,7 +80,7 @@ class _RoomChangeScreenState extends ConsumerState<RoomChangeScreen> {
     final historyState = ref.watch(roomChangeProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Room Change Request')),
+      appBar: const GradientAppBar(title: 'Room Change Request'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

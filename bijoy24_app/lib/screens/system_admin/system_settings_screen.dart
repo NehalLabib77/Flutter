@@ -1,240 +1,268 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
-import '../../constants/app_strings.dart';
+import '../../widgets/gradient_app_bar.dart';
+import '../../providers/auth_provider.dart';
+import '../../widgets/app_card.dart';
 
-class SystemSettingsScreen extends ConsumerStatefulWidget {
+class SystemSettingsScreen extends ConsumerWidget {
   const SystemSettingsScreen({super.key});
 
   @override
-  ConsumerState<SystemSettingsScreen> createState() =>
-      _SystemSettingsScreenState();
-}
-
-class _SystemSettingsScreenState extends ConsumerState<SystemSettingsScreen> {
-  final _faculties = List<String>.from(AppStrings.faculties);
-  final _newFacultyCtrl = TextEditingController();
-
-  @override
-  void dispose() {
-    _newFacultyCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('System Settings')),
+      appBar: const GradientAppBar(title: 'Settings'),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // App info card
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+          // Profile section
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Colors.white24,
+                  child: Icon(
+                    Icons.person_rounded,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.info_outline,
-                          color: AppColors.primary,
+                      const Text(
+                        'System Administrator',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'BIJOY-24',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'Residential Hall Management System',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Super Admin',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
-                  const Divider(height: 24),
-                  _settingRow('Version', '1.0.0'),
-                  _settingRow('API Status', 'Connected'),
-                  _settingRow('Platform', 'Flutter'),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
-          // Faculties management
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Faculties',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Manage the list of faculties available in the system.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _newFacultyCtrl,
-                          decoration: InputDecoration(
-                            hintText: 'New faculty name',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton.filled(
-                        onPressed: _addFaculty,
-                        icon: const Icon(Icons.add),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  ..._faculties.map(
-                    (f) => ListTile(
-                      dense: true,
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(f),
-                      trailing: IconButton(
-                        icon: const Icon(
-                          Icons.close,
-                          size: 18,
-                          color: AppColors.error,
-                        ),
-                        onPressed: () => setState(() => _faculties.remove(f)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Blood groups
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Blood Groups',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: AppStrings.bloodGroups
-                        .map(
-                          (bg) => Chip(
-                            label: Text(bg),
-                            backgroundColor: AppColors.error.withValues(
-                              alpha: 0.1,
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Danger zone
-          Card(
-            color: AppColors.error.withValues(alpha: 0.05),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Danger Zone',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.error,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
-                      side: const BorderSide(color: AppColors.error),
-                    ),
-                    onPressed: () {
+
+          const SizedBox(height: 24),
+
+          _SectionTitle('Appearance'),
+          AppCard(
+            child: Column(
+              children: [
+                _SettingsTile(
+                  icon: Icons.dark_mode_rounded,
+                  title: 'Dark Mode',
+                  trailing: Switch(
+                    value: false,
+                    onChanged: (_) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Cache cleared successfully'),
+                          content: Text('Theme switching coming soon!'),
                         ),
                       );
                     },
-                    child: const Text('Clear App Cache'),
                   ),
-                ],
-              ),
+                ),
+                const Divider(height: 1),
+                _SettingsTile(
+                  icon: Icons.text_fields_rounded,
+                  title: 'Font Size',
+                  subtitle: 'Default',
+                  onTap: () {},
+                ),
+              ],
             ),
           ),
+
+          const SizedBox(height: 20),
+
+          _SectionTitle('Notifications'),
+          AppCard(
+            child: Column(
+              children: [
+                _SettingsTile(
+                  icon: Icons.notifications_active_rounded,
+                  title: 'Push Notifications',
+                  trailing: Switch(value: true, onChanged: (_) {}),
+                ),
+                const Divider(height: 1),
+                _SettingsTile(
+                  icon: Icons.email_rounded,
+                  title: 'Email Notifications',
+                  trailing: Switch(value: false, onChanged: (_) {}),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          _SectionTitle('System'),
+          AppCard(
+            child: Column(
+              children: [
+                _SettingsTile(
+                  icon: Icons.backup_rounded,
+                  title: 'Backup Data',
+                  subtitle: 'Last backup: Never',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Backup feature coming soon!'),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                _SettingsTile(
+                  icon: Icons.refresh_rounded,
+                  title: 'Clear Cache',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Cache cleared')),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                _SettingsTile(
+                  icon: Icons.info_outline_rounded,
+                  title: 'About',
+                  subtitle: 'Bijoy24 v1.0.0',
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          _SectionTitle('Account'),
+          AppCard(
+            child: _SettingsTile(
+              icon: Icons.logout_rounded,
+              title: 'Logout',
+              iconColor: Colors.red,
+              textColor: Colors.red,
+              onTap: () async {
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    title: const Text('Logout'),
+                    content: const Text('Are you sure you want to logout?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel'),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Logout'),
+                      ),
+                    ],
+                  ),
+                );
+                if (ok == true) {
+                  await ref.read(authProvider.notifier).logout();
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 32),
         ],
       ),
     );
   }
+}
 
-  Widget _settingRow(String label, String value) {
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  const _SectionTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
-        ],
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey.shade500,
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }
+}
 
-  void _addFaculty() {
-    final name = _newFacultyCtrl.text.trim();
-    if (name.isNotEmpty && !_faculties.contains(name)) {
-      setState(() {
-        _faculties.add(name);
-        _newFacultyCtrl.clear();
-      });
-    }
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final Color? iconColor;
+  final Color? textColor;
+
+  const _SettingsTile({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    this.trailing,
+    this.onTap,
+    this.iconColor,
+    this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: (iconColor ?? AppColors.primary).withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: iconColor ?? AppColors.primary, size: 22),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          color: textColor,
+          fontSize: 14,
+        ),
+      ),
+      subtitle: subtitle != null
+          ? Text(
+              subtitle!,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+            )
+          : null,
+      trailing:
+          trailing ?? (onTap != null ? const Icon(Icons.chevron_right) : null),
+      onTap: onTap,
+    );
   }
 }

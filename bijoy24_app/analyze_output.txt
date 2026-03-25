@@ -1,90 +1,45 @@
-﻿Analyzing lib...
+﻿Analyzing bijoy24_app...                                        
 
-  error - screens\hall_admin\manage_rooms_screen.dart:24:55 - The method 'fetchRooms' isn't defined for the type 'HallAdminRoomsNotifier'. Try correcting the name to the name of an existing method, or defining a method named 'fetchRooms'. - undefined_method
-  error - screens\hall_admin\manage_rooms_screen.dart:67:59 - The method 'fetchRooms' isn't defined for the type 'HallAdminRoomsNotifier'. Try correcting the name to the name of an existing method, or defining a method named 'fetchRooms'. - undefined_method
-  error - screens\hall_admin\manage_rooms_screen.dart:73:40 - The getter 'currentOccupancy' isn't defined for the type 'Room'. Try importing the library that defines 'currentOccupancy', correcting the name to the name of an existing getter, or defining a getter or field named 'currentOccupancy'. - undefined_getter
-  error - screens\hall_admin\manage_rooms_screen.dart:74:39 - The getter 'capacity' isn't defined for the type 'Room'. Try importing the library that defines 'capacity', correcting the name to the name of an existing getter, or defining a getter or field named 'capacity'. - undefined_getter
-  error - screens\hall_admin\manage_rooms_screen.dart:94:28 - The getter 'name' isn't defined for the type 'Room'. Try importing the library that defines 'name', correcting the name to the name of an existing getter, or defining a getter or field named 'name'. - undefined_getter
-  error - screens\hall_admin\manage_rooms_screen.dart:120:49 - The argument type 'String' can't be assigned to the parameter type 'int'.  - argument_type_not_assignable
-  error - screens\hall_admin\manage_rooms_screen.dart:146:68 - The method 'fetchRooms' isn't defined for the type 'HallAdminRoomsNotifier'. Try correcting the name to the name of an existing method, or defining a method named 'fetchRooms'. - undefined_method
-  error - screens\hall_admin\manage_rooms_screen.dart:189:55 - The method 'deleteRoom' isn't defined for the type 'HallAdminRoomsNotifier'. Try correcting the name to the name of an existing method, or defining a method named 'deleteRoom'. - undefined_method
-  error - screens\system_admin\manage_hall_admins_screen.dart:71:40 - The getter 'name' isn't defined for the type 'HallAdmin'. Try importing the library that defines 'name', correcting the name to the name of an existing getter, or defining a getter or field named 'name'. - undefined_getter
-  error - screens\system_admin\manage_hall_admins_screen.dart:83:43 - The getter 'name' isn't defined for the type 'HallAdmin'. Try importing the library that defines 'name', correcting the name to the name of an existing getter, or defining a getter or field named 'name'. - undefined_getter
-  error - screens\system_admin\manage_hall_admins_screen.dart:83:67 - The getter 'adminId' isn't defined for the type 'HallAdmin'. Try importing the library that defines 'adminId', correcting the name to the name of an existing getter, or defining a getter or field named 'adminId'. - undefined_getter
-warning - screens\hall_admin\maintenance_requests_screen.dart:120:110 - The receiver can't be null, so the null-aware operator '?.' is unnecessary. Try replacing the operator '?.' with '.'. - invalid_null_aware_operator
-warning - screens\system_admin\boarder_registry_screen.dart:103:105 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
-warning - screens\system_admin\boarder_registry_screen.dart:103:108 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - screens\system_admin\create_boarder_screen.dart:4:8 - Unused import: '../../constants/app_colors.dart'. Try removing the import directive. - unused_import
-warning - screens\system_admin\create_boarder_screen.dart:100:50 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
-warning - screens\system_admin\create_boarder_screen.dart:100:53 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - screens\system_admin\create_hall_admin_screen.dart:162:50 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
-warning - screens\system_admin\create_hall_admin_screen.dart:162:53 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - screens\system_admin\create_hall_screen.dart:4:8 - Unused import: '../../constants/app_colors.dart'. Try removing the import directive. - unused_import
-warning - screens\system_admin\edit_boarder_screen.dart:4:8 - Unused import: '../../constants/app_colors.dart'. Try removing the import directive. - unused_import
-warning - screens\system_admin\edit_boarder_screen.dart:122:54 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
-warning - screens\system_admin\edit_boarder_screen.dart:122:57 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - screens\system_admin\edit_hall_admin_screen.dart:4:8 - Unused import: '../../constants/app_colors.dart'. Try removing the import directive. - unused_import
-warning - screens\system_admin\edit_hall_admin_screen.dart:115:54 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
-warning - screens\system_admin\edit_hall_admin_screen.dart:115:57 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - screens\system_admin\edit_hall_screen.dart:4:8 - Unused import: '../../constants/app_colors.dart'. Try removing the import directive. - unused_import
-warning - screens\system_admin\global_rooms_screen.dart:50:46 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
-warning - screens\system_admin\global_rooms_screen.dart:50:49 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - screens\system_admin\manage_hall_admins_screen.dart:132:57 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
-warning - screens\system_admin\manage_hall_admins_screen.dart:132:60 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - screens\system_admin\manage_halls_screen.dart:64:37 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
-warning - screens\system_admin\manage_halls_screen.dart:64:40 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - screens\system_admin\manage_halls_screen.dart:68:43 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-   info - screens\auth\student_registration_screen.dart:160:17 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\auth\student_registration_screen.dart:173:17 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\auth\student_registration_screen.dart:187:17 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\auth\student_registration_screen.dart:220:17 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\auth\student_registration_screen.dart:249:21 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\auth\student_registration_screen.dart:264:28 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\auth\student_registration_screen.dart:338:13 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-   info - screens\auth\student_registration_screen.dart:353:9 - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\auth\student_registration_screen.dart:355:9 - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\hall_admin\create_room_screen.dart:121:17 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\hall_admin\edit_room_screen.dart:137:21 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\hall_admin\edit_room_screen.dart:161:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\hall_admin\maintenance_requests_screen.dart:181:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\hall_admin\manage_rooms_screen.dart:144:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\hall_admin\room_applications_screen.dart:157:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\hall_admin\room_assignments_screen.dart:121:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\hall_admin\room_change_requests_screen.dart:149:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\hall_admin\seat_applications_screen.dart:159:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\hall_admin\view_room_members_screen.dart:80:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\student\apply_room_screen.dart:106:26 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\student\apply_room_screen.dart:207:26 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\student\maintenance_list_screen.dart:164:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\student\room_change_screen.dart:211:26 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\student\seat_booking_screen.dart:104:17 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\student\seat_booking_screen.dart:125:26 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\student\seat_booking_screen.dart:137:21 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\student\seat_booking_screen.dart:160:28 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\student\seat_booking_screen.dart:181:28 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\student\student_profile_screen.dart:242:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\boarder_registry_screen.dart:128:26 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\create_boarder_screen.dart:91:19 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\system_admin\create_boarder_screen.dart:108:28 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\create_boarder_screen.dart:112:17 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\system_admin\create_hall_admin_screen.dart:153:19 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\system_admin\create_hall_admin_screen.dart:170:28 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\create_hall_screen.dart:50:17 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\system_admin\database_stats_screen.dart:104:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\edit_boarder_screen.dart:113:23 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\system_admin\edit_boarder_screen.dart:130:32 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\edit_boarder_screen.dart:134:21 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\system_admin\edit_boarder_screen.dart:161:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\edit_hall_admin_screen.dart:106:23 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\system_admin\edit_hall_admin_screen.dart:123:32 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\edit_hall_admin_screen.dart:142:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\edit_hall_screen.dart:70:21 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\system_admin\edit_hall_screen.dart:107:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\global_rooms_screen.dart:37:17 - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - screens\system_admin\global_rooms_screen.dart:62:26 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\global_rooms_screen.dart:139:18 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\manage_hall_admins_screen.dart:157:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\manage_halls_screen.dart:91:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
-   info - screens\system_admin\system_admin_dashboard.dart:264:20 - Unnecessary use of multiple underscores. Try using '_'. - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\auth\student_registration_screen.dart:264:28 - unnecessary_underscores
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\auth\student_registration_screen.dart:354:9 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\auth\student_registration_screen.dart:356:9 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\screens\student\apply_room_screen.dart:106:26 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\student\apply_room_screen.dart:207:26 - unnecessary_underscores
+  error - The named parameter 'action' isn't defined - lib\screens\student\maintenance_list_screen.dart:44:15 - undefined_named_parameter
+   info - Unnecessary use of multiple underscores - lib\screens\student\maintenance_list_screen.dart:164:20 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\student\room_change_screen.dart:211:26 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\student\seat_booking_screen.dart:125:26 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\student\seat_booking_screen.dart:160:28 - unnecessary_underscores
+  error - The named parameter 'subtitle' is required, but there's no corresponding argument - lib\screens\student\seat_booking_screen.dart:169:34 - missing_required_argument
+   info - Unnecessary use of multiple underscores - lib\screens\student\seat_booking_screen.dart:181:28 - unnecessary_underscores
+  error - The named parameter 'label' is required, but there's no corresponding argument - lib\screens\student\student_dashboard.dart:205:19 - missing_required_argument
+  error - The named parameter 'title' isn't defined - lib\screens\student\student_dashboard.dart:206:21 - undefined_named_parameter
+  error - The named parameter 'label' is required, but there's no corresponding argument - lib\screens\student\student_dashboard.dart:212:19 - missing_required_argument
+  error - The named parameter 'title' isn't defined - lib\screens\student\student_dashboard.dart:213:21 - undefined_named_parameter
+  error - The named parameter 'label' is required, but there's no corresponding argument - lib\screens\student\student_dashboard.dart:219:19 - missing_required_argument
+  error - The named parameter 'title' isn't defined - lib\screens\student\student_dashboard.dart:220:21 - undefined_named_parameter
+  error - The named parameter 'label' is required, but there's no corresponding argument - lib\screens\student\student_dashboard.dart:226:19 - missing_required_argument
+  error - The named parameter 'title' isn't defined - lib\screens\student\student_dashboard.dart:227:21 - undefined_named_parameter
+   info - Unnecessary use of multiple underscores - lib\screens\student\student_profile_screen.dart:242:20 - unnecessary_underscores
+  error - 1 positional argument expected by 'showConfirmationDialog', but 0 found - lib\screens\system_admin\boarder_registry_screen.dart:204:7 - not_enough_positional_arguments
+  error - The named parameter 'context' isn't defined - lib\screens\system_admin\boarder_registry_screen.dart:204:7 - undefined_named_parameter
+  error - The named parameter 'confirmLabel' isn't defined - lib\screens\system_admin\boarder_registry_screen.dart:207:7 - undefined_named_parameter
+  error - The named parameter 'isDestructive' isn't defined - lib\screens\system_admin\boarder_registry_screen.dart:208:7 - undefined_named_parameter
+  error - A nullable expression can't be used as a condition - lib\screens\system_admin\boarder_registry_screen.dart:210:9 - unchecked_use_of_nullable_value
+  error - 1 positional argument expected by 'showConfirmationDialog', but 0 found - lib\screens\system_admin\manage_hall_admins_screen.dart:168:7 - not_enough_positional_arguments
+  error - The named parameter 'context' isn't defined - lib\screens\system_admin\manage_hall_admins_screen.dart:168:7 - undefined_named_parameter
+  error - The named parameter 'confirmLabel' isn't defined - lib\screens\system_admin\manage_hall_admins_screen.dart:171:7 - undefined_named_parameter
+  error - The named parameter 'isDestructive' isn't defined - lib\screens\system_admin\manage_hall_admins_screen.dart:172:7 - undefined_named_parameter
+  error - A nullable expression can't be used as a condition - lib\screens\system_admin\manage_hall_admins_screen.dart:174:9 - unchecked_use_of_nullable_value
+  error - Target of URI doesn't exist: '../../services/auth_service.dart' - lib\screens\system_admin\system_settings_screen.dart:4:8 - uri_does_not_exist
+  error - Undefined name 'authServiceProvider' - lib\screens\system_admin\system_settings_screen.dart:183:34 - undefined_identifier
+  error - The name 'MyApp' isn't a class - test\widget_test.dart:16:35 - creation_with_non_type
 
-86 issues found.
+flutter : 34 issues found. (ran in 1.5s)
+At line:1 char:1
++ flutter analyze 2>&1 | Out-File analyze_output.txt -Encoding utf8; Ge ...
++ ~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (34 issues found. (ran in 1.5s):St 
+   ring) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

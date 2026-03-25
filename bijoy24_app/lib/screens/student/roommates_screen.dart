@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../providers/student_provider.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/loading_widget.dart';
@@ -24,7 +25,7 @@ class _RoommatesScreenState extends ConsumerState<RoommatesScreen> {
     final state = ref.watch(roommatesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Roommates')),
+      appBar: const GradientAppBar(title: 'My Roommates'),
       body: state.when(
         data: (students) {
           if (students.isEmpty) {

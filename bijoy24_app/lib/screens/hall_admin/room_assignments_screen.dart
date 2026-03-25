@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../providers/hall_admin_provider.dart';
-import '../../widgets/status_badge.dart';
+import '../../widgets/app_card.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/loading_widget.dart';
-import '../../widgets/confirmation_dialog.dart';
+import '../../widgets/status_badge.dart';
 
 class RoomAssignmentsScreen extends ConsumerStatefulWidget {
   const RoomAssignmentsScreen({super.key});
@@ -29,13 +30,14 @@ class _RoomAssignmentsScreenState extends ConsumerState<RoomAssignmentsScreen> {
     final state = ref.watch(hallAdminAssignmentsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Room Assignments')),
+      appBar: const GradientAppBar(title: 'Room Assignments'),
       body: state.when(
         data: (assignments) {
           if (assignments.isEmpty) {
             return const EmptyStateWidget(
-              icon: Icons.assignment_outlined,
-              title: 'No Active Assignments',
+              icon: Icons.assignment_ind_rounded,
+              title: 'No Assignments',
+              subtitle: 'Room assignments will appear here',
             );
           }
           return RefreshIndicator(
@@ -46,71 +48,78 @@ class _RoomAssignmentsScreenState extends ConsumerState<RoomAssignmentsScreen> {
               itemCount: assignments.length,
               itemBuilder: (ctx, i) {
                 final a = assignments[i];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                return AppCard(
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 22,
+                        backgroundColor: AppColors.primarySurface,
+                        child: Text(
+                          (a.studentName ?? 'S').substring(0, 1).toUpperCase(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.person, size: 20),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                a.studentName ?? 'Student #${a.studentId}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
+                            Text(
+                              a.studentName ?? 'Student',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Room: ${a.roomIdentity} • ${a.faculty ?? 'N/A'}',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Since: ${a.assignmentDate.toString().split(' ').first}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textTertiary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          StatusBadge(status: a.status),
+                          const SizedBox(height: 8),
+                          if (a.status == 'Active')
+                            SizedBox(
+                              height: 30,
+                              child: TextButton(
+                                onPressed: () => ref
+                                    .read(hallAdminAssignmentsProvider.notifier)
+                                    .unassign(a.assignmentId),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  foregroundColor: AppColors.error,
+                                ),
+                                child: const Text(
+                                  'Unassign',
+                                  style: TextStyle(fontSize: 12),
                                 ),
                               ),
                             ),
-                            StatusBadge(status: a.status),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            _chip(
-                              Icons.meeting_room,
-                              'Room ${a.roomIdentity}',
-                            ),
-                            if (a.faculty != null) ...[
-                              const SizedBox(width: 12),
-                              _chip(
-                                Icons.school,
-                                a.faculty!,
-                              ),
-                            ],
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Assigned: ${a.assignmentDate.toString().split(' ')[0]}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        if (a.status == 'Active') ...[
-                          const Divider(height: 16),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton.icon(
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppColors.error,
-                              ),
-                              icon: const Icon(Icons.person_remove, size: 18),
-                              label: const Text('Unassign'),
-                              onPressed: () => _unassign(a.assignmentId),
-                            ),
-                          ),
                         ],
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 );
               },
@@ -118,36 +127,12 @@ class _RoomAssignmentsScreenState extends ConsumerState<RoomAssignmentsScreen> {
           );
         },
         loading: () => const LoadingWidget(),
-        error: (_, __) => ErrorRetryWidget(
+        error: (_, _) => ErrorRetryWidget(
           message: 'Failed to load assignments',
           onRetry: () =>
               ref.read(hallAdminAssignmentsProvider.notifier).fetch(),
         ),
       ),
     );
-  }
-
-  Widget _chip(IconData icon, String label) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: AppColors.textSecondary),
-        const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 13)),
-      ],
-    );
-  }
-
-  Future<void> _unassign(int id) async {
-    final confirmed = await showConfirmationDialog(
-      context,
-      title: 'Unassign Student',
-      message: 'Remove this student from their room and seat?',
-      confirmText: 'Unassign',
-      confirmColor: AppColors.error,
-    );
-    if (confirmed == true) {
-      await ref.read(hallAdminAssignmentsProvider.notifier).unassign(id);
-    }
   }
 }

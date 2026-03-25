@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 
@@ -76,7 +77,7 @@ class _HallAdminRegistrationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.hallAdminRegistration)),
+      appBar: const GradientAppBar(title: AppStrings.hallAdminRegistration),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(

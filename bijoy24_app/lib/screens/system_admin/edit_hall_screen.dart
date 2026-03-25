@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../widgets/gradient_app_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../constants/app_colors.dart';
 import '../../providers/system_admin_provider.dart';
 import '../../widgets/loading_widget.dart';
 
@@ -15,98 +15,125 @@ class EditHallScreen extends ConsumerStatefulWidget {
 
 class _EditHallScreenState extends ConsumerState<EditHallScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
-  final _locationCtrl = TextEditingController();
-  String _hallType = 'Male';
+  final _name = TextEditingController();
+  String _type = 'Male';
+  final _capacity = TextEditingController();
+  final _location = TextEditingController();
   bool _loading = false;
   bool _initialized = false;
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
-    _locationCtrl.dispose();
+    _name.dispose();
+    _capacity.dispose();
+    _location.dispose();
     super.dispose();
   }
 
-  void _initFields(dynamic hall) {
-    if (_initialized) return;
-    _initialized = true;
-    _nameCtrl.text = hall.hallName ?? '';
-    _locationCtrl.text = hall.location ?? '';
-    _hallType = hall.hallType ?? 'Male';
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(sysAdminHallsProvider.notifier).fetch());
+  }
+
+  void _initFromHall() {
+    final halls = ref.read(sysAdminHallsProvider);
+    halls.whenData((list) {
+      final hall = list.cast().firstWhere(
+        (h) => h.hallId == widget.hallId,
+        orElse: () => null,
+      );
+      if (hall != null && !_initialized) {
+        _name.text = hall.hallName;
+        _type = hall.hallType;
+        _capacity.text = '${hall.hallCapacity}';
+        _location.text = hall.location ?? '';
+        _initialized = true;
+        if (mounted) setState(() {});
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(sysAdminHallsProvider);
+    state.whenData((_) => _initFromHall());
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Hall')),
+      appBar: const GradientAppBar(title: 'Edit Hall'),
       body: state.when(
-        data: (halls) {
-          final hall = halls.firstWhere(
-            (h) => h.hallId == widget.hallId,
-            orElse: () => halls.first,
-          );
-          _initFields(hall);
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextFormField(
-                    controller: _nameCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Hall Name *',
-                      prefixIcon: Icon(Icons.apartment),
-                    ),
-                    validator: (v) =>
-                        (v == null || v.isEmpty) ? 'Required' : null,
+        loading: () => const LoadingWidget(),
+        error: (_, _) => ErrorRetryWidget(
+          message: 'Failed to load hall',
+          onRetry: () => ref.read(sysAdminHallsProvider.notifier).fetch(),
+        ),
+        data: (_) => SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _name,
+                  decoration: const InputDecoration(
+                    labelText: 'Hall Name',
+                    prefixIcon: Icon(Icons.apartment_rounded),
                   ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: _hallType,
-                    decoration: const InputDecoration(
-                      labelText: 'Hall Type *',
-                      prefixIcon: Icon(Icons.wc),
-                    ),
-                    items: ['Male', 'Female']
-                        .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                        .toList(),
-                    onChanged: (v) =>
-                        setState(() => _hallType = v ?? _hallType),
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  initialValue: _type,
+                  decoration: const InputDecoration(
+                    labelText: 'Hall Type',
+                    prefixIcon: Icon(Icons.category_rounded),
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _locationCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Location',
-                      prefixIcon: Icon(Icons.location_on),
-                    ),
-                    maxLines: 2,
+                  items: ['Male', 'Female', 'Mixed']
+                      .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setState(() => _type = v);
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _capacity,
+                  decoration: const InputDecoration(
+                    labelText: 'Capacity',
+                    prefixIcon: Icon(Icons.people_rounded),
                   ),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
+                  keyboardType: TextInputType.number,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _location,
+                  decoration: const InputDecoration(
+                    labelText: 'Location',
+                    prefixIcon: Icon(Icons.location_on_rounded),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: FilledButton(
                     onPressed: _loading ? null : _submit,
                     child: _loading
                         ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
                           )
                         : const Text('Save Changes'),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        },
-        loading: () => const LoadingWidget(),
-        error: (_, __) => ErrorRetryWidget(
-          message: 'Failed to load hall',
-          onRetry: () => ref.read(sysAdminHallsProvider.notifier).fetch(),
+          ),
         ),
       ),
     );
@@ -115,26 +142,24 @@ class _EditHallScreenState extends ConsumerState<EditHallScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-    try {
-      await ref.read(sysAdminHallsProvider.notifier).update(widget.hallId, {
-        'hallName': _nameCtrl.text.trim(),
-        'hallType': _hallType,
-        'location': _locationCtrl.text.trim(),
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Hall updated successfully')),
-        );
-        context.pop();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
+
+    final data = {
+      'hallName': _name.text.trim(),
+      'hallType': _type,
+      'hallCapacity': int.tryParse(_capacity.text.trim()) ?? 0,
+      'location': _location.text.trim(),
+    };
+
+    final ok = await ref
+        .read(sysAdminHallsProvider.notifier)
+        .update(widget.hallId, data);
+    setState(() => _loading = false);
+
+    if (ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Hall updated successfully')),
+      );
+      context.pop();
     }
   }
 }

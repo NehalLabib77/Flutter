@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../models/seat.dart';
 import '../../providers/hall_provider.dart';
 import '../../providers/student_provider.dart';
@@ -92,7 +93,7 @@ class _SeatBookingScreenState extends ConsumerState<SeatBookingScreen> {
     final seatsState = ref.watch(seatListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Seat Booking')),
+      appBar: const GradientAppBar(title: 'Seat Booking'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -101,7 +102,7 @@ class _SeatBookingScreenState extends ConsumerState<SeatBookingScreen> {
             // Hall selection
             hallsState.when(
               data: (halls) => DropdownButtonFormField<int>(
-                value: _selectedHallId,
+                initialValue: _selectedHallId,
                 decoration: const InputDecoration(labelText: 'Select Hall'),
                 items: halls
                     .map(
@@ -134,7 +135,7 @@ class _SeatBookingScreenState extends ConsumerState<SeatBookingScreen> {
                       .where((r) => r.status == 'Available')
                       .toList();
                   return DropdownButtonFormField<String>(
-                    value: _selectedRoomId,
+                    initialValue: _selectedRoomId,
                     decoration: const InputDecoration(labelText: 'Select Room'),
                     items: available
                         .map(
@@ -169,6 +170,7 @@ class _SeatBookingScreenState extends ConsumerState<SeatBookingScreen> {
                     return const EmptyStateWidget(
                       icon: Icons.event_seat,
                       title: 'No Seats Found',
+                      subtitle: 'This room has no available seats.',
                     );
                   }
                   return SeatLayoutWidget(

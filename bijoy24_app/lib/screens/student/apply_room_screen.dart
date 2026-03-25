@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/hall_provider.dart';
 import '../../providers/student_provider.dart';
@@ -57,7 +58,7 @@ class _ApplyRoomScreenState extends ConsumerState<ApplyRoomScreen> {
     final appState = ref.watch(roomApplicationProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Apply for Room')),
+      appBar: const GradientAppBar(title: 'Apply for Room'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(

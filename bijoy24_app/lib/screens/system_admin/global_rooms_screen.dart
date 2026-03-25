@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../providers/hall_provider.dart';
-import '../../widgets/empty_state_widget.dart';
 import '../../widgets/loading_widget.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/status_badge.dart';
+import '../../widgets/empty_state_widget.dart';
 
 class GlobalRoomsScreen extends ConsumerStatefulWidget {
   const GlobalRoomsScreen({super.key});
@@ -24,33 +27,43 @@ class _GlobalRoomsScreenState extends ConsumerState<GlobalRoomsScreen> {
   @override
   Widget build(BuildContext context) {
     final hallsState = ref.watch(hallListProvider);
+    final roomsState = _selectedHallId != null
+        ? ref.watch(roomListProvider)
+        : null;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Global Rooms View')),
+      appBar: const GradientAppBar(title: 'All Rooms'),
       body: Column(
         children: [
-          // Hall selector
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: hallsState.when(
-              data: (halls) => DropdownButtonFormField<int>(
-                value: _selectedHallId,
+          // Hall picker
+          hallsState.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.all(16),
+              child: LinearProgressIndicator(),
+            ),
+            error: (_, _) => Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Error loading halls',
+                style: TextStyle(color: Colors.red.shade600),
+              ),
+            ),
+            data: (halls) => Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: DropdownButtonFormField<int>(
+                initialValue: _selectedHallId,
                 decoration: const InputDecoration(
                   labelText: 'Select Hall',
-                  prefixIcon: Icon(Icons.apartment),
+                  prefixIcon: Icon(Icons.apartment_rounded),
                 ),
-                items: [
-                  const DropdownMenuItem<int>(
-                    value: null,
-                    child: Text('All Halls'),
-                  ),
-                  ...halls.map(
-                    (h) => DropdownMenuItem(
-                      value: h.hallId,
-                      child: Text(h.hallName ?? 'Hall #${h.hallId}'),
-                    ),
-                  ),
-                ],
+                items: halls
+                    .map(
+                      (h) => DropdownMenuItem(
+                        value: h.hallId,
+                        child: Text(h.hallName),
+                      ),
+                    )
+                    .toList(),
                 onChanged: (v) {
                   setState(() => _selectedHallId = v);
                   if (v != null) {
@@ -58,91 +71,125 @@ class _GlobalRoomsScreenState extends ConsumerState<GlobalRoomsScreen> {
                   }
                 },
               ),
-              loading: () => const LinearProgressIndicator(),
-              error: (_, __) => const Text('Failed to load halls'),
             ),
           ),
+
+          const Divider(height: 1),
+
           // Room list
           Expanded(
             child: _selectedHallId == null
                 ? const EmptyStateWidget(
-                    icon: Icons.search,
+                    icon: Icons.meeting_room_rounded,
                     title: 'Select a Hall',
-                    subtitle: 'Choose a hall above to view its rooms',
+                    subtitle: 'Choose a hall above to view its rooms.',
                   )
-                : _buildRoomList(),
+                : roomsState == null
+                ? const LoadingWidget()
+                : roomsState.when(
+                    loading: () => const LoadingWidget(),
+                    error: (_, _) => ErrorRetryWidget(
+                      message: 'Failed to load rooms',
+                      onRetry: () => ref
+                          .read(roomListProvider.notifier)
+                          .fetchForHall(_selectedHallId!),
+                    ),
+                    data: (rooms) {
+                      if (rooms.isEmpty) {
+                        return const EmptyStateWidget(
+                          icon: Icons.meeting_room_outlined,
+                          title: 'No Rooms',
+                          subtitle: 'This hall has no rooms yet.',
+                        );
+                      }
+                      return ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                        itemCount: rooms.length,
+                        itemBuilder: (ctx, i) {
+                          final r = rooms[i];
+                          final occupancy = r.roomCapacity > 0
+                              ? (r.roomCapacity - r.availableSlots) /
+                                    r.roomCapacity
+                              : 0.0;
+                          return AppCard(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    gradient: AppColors.primaryGradient,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.door_front_door_rounded,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        r.roomIdentity,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.people_rounded,
+                                            size: 14,
+                                            color: Colors.grey.shade500,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${r.roomCapacity - r.availableSlots}/${r.roomCapacity}',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                              child: LinearProgressIndicator(
+                                                value: occupancy,
+                                                minHeight: 5,
+                                                backgroundColor:
+                                                    Colors.grey.shade200,
+                                                color: occupancy > 0.9
+                                                    ? Colors.red
+                                                    : occupancy > 0.6
+                                                    ? Colors.orange
+                                                    : AppColors.primary,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                StatusBadge(status: r.status, fontSize: 10),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildRoomList() {
-    final roomsState = ref.watch(roomListProvider);
-    return roomsState.when(
-      data: (rooms) {
-        if (rooms.isEmpty) {
-          return const EmptyStateWidget(
-            icon: Icons.meeting_room_outlined,
-            title: 'No Rooms',
-          );
-        }
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: rooms.length,
-          itemBuilder: (ctx, i) {
-            final room = rooms[i];
-            final occ = room.roomCapacity - room.availableSlots;
-            final cap = room.roomCapacity;
-            final pct = cap > 0 ? occ / cap : 0.0;
-            return Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: pct >= 1
-                      ? AppColors.error
-                      : AppColors.approved,
-                  child: Text(
-                    room.roomNumber ?? '-',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                title: Text(room.roomName ?? 'Room ${room.roomNumber}'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Floor ${room.floor ?? '-'} • ${room.wing ?? '-'} Wing • Block ${room.block ?? '-'}',
-                    ),
-                    const SizedBox(height: 4),
-                    LinearProgressIndicator(
-                      value: pct,
-                      backgroundColor: Colors.grey.shade200,
-                      valueColor: AlwaysStoppedAnimation(
-                        pct >= 1.0 ? AppColors.error : AppColors.primary,
-                      ),
-                    ),
-                    Text('$occ / $cap', style: const TextStyle(fontSize: 11)),
-                  ],
-                ),
-                isThreeLine: true,
-              ),
-            );
-          },
-        );
-      },
-      loading: () => const LoadingWidget(),
-      error: (_, __) => ErrorRetryWidget(
-        message: 'Failed to load rooms',
-        onRetry: () {
-          if (_selectedHallId != null) {
-            ref.read(roomListProvider.notifier).fetchForHall(_selectedHallId!);
-          }
-        },
       ),
     );
   }

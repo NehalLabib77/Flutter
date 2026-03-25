@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
+/// Modern confirmation dialog
 Future<bool?> showConfirmationDialog(
   BuildContext context, {
   required String title,
@@ -11,62 +12,89 @@ Future<bool?> showConfirmationDialog(
 }) {
   return showDialog<bool>(
     context: context,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text(title),
-      content: Text(message),
+    barrierDismissible: false,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+      ),
+      content: Text(
+        message,
+        style: const TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 14,
+          height: 1.5,
+        ),
+      ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
+          onPressed: () => Navigator.pop(ctx, false),
           child: Text(
             cancelText,
             style: const TextStyle(color: AppColors.textSecondary),
           ),
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
+        FilledButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          style: FilledButton.styleFrom(
             backgroundColor: confirmColor ?? AppColors.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
-          onPressed: () => Navigator.of(context).pop(true),
           child: Text(confirmText),
         ),
       ],
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
     ),
   );
 }
 
+/// Modern remarks dialog with text field
 Future<String?> showRemarksDialog(
   BuildContext context, {
   required String title,
-  String hintText = 'Enter remarks (optional)',
+  String hintText = 'Enter remarks...',
 }) {
   final controller = TextEditingController();
   return showDialog<String>(
     context: context,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text(title),
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+      ),
       content: TextField(
         controller: controller,
         maxLines: 3,
         decoration: InputDecoration(
           hintText: hintText,
-          border: const OutlineInputBorder(),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(null),
+          onPressed: () => Navigator.pop(ctx),
           child: const Text(
             'Cancel',
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(controller.text),
+        FilledButton(
+          onPressed: () => Navigator.pop(ctx, controller.text),
+          style: FilledButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
           child: const Text('Submit'),
         ),
       ],
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
     ),
   );
 }

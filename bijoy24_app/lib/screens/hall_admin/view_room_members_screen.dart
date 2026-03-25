@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../providers/hall_admin_provider.dart';
+import '../../widgets/app_card.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/loading_widget.dart';
 
@@ -28,21 +30,17 @@ class _ViewRoomMembersScreenState extends ConsumerState<ViewRoomMembersScreen> {
     final state = ref.watch(hallAdminAssignmentsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Room ${widget.roomId} Members')),
+      appBar: GradientAppBar(title: 'Room #${widget.roomId} Members'),
       body: state.when(
-        data: (assignments) {
-          final members = assignments
-              .where(
-                (a) =>
-                    a.roomIdentity == widget.roomId.toString() &&
-                    a.status == 'Active',
-              )
+        data: (all) {
+          final members = all
+              .where((a) => a.roomIdentity.contains(widget.roomId.toString()))
               .toList();
           if (members.isEmpty) {
             return const EmptyStateWidget(
-              icon: Icons.people_outline,
-              title: 'No Members Assigned',
-              subtitle: 'This room currently has no occupants',
+              icon: Icons.people_outline_rounded,
+              title: 'No Members',
+              subtitle: 'This room has no assigned students',
             );
           }
           return ListView.builder(
@@ -50,34 +48,60 @@ class _ViewRoomMembersScreenState extends ConsumerState<ViewRoomMembersScreen> {
             itemCount: members.length,
             itemBuilder: (ctx, i) {
               final m = members[i];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.primary,
-                    child: Text(
-                      (m.studentName ?? 'S').substring(0, 1).toUpperCase(),
-                      style: const TextStyle(color: Colors.white),
+              return AppCard(
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundColor: AppColors.primarySurface,
+                      child: Text(
+                        (m.studentName ?? 'S').substring(0, 1).toUpperCase(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    m.studentName ?? 'Student #${m.studentId}',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(
-                    '${m.faculty ?? 'N/A'} \u2022 Since ${m.assignmentDate.toString().split(' ')[0]}',
-                  ),
-                  trailing: const Icon(Icons.chevron_right),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            m.studentName ?? 'Student',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${m.faculty ?? 'N/A'} • Since ${m.assignmentDate.toString().split(' ').first}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (m.mobile != null)
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.phone_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                      ),
+                  ],
                 ),
               );
             },
           );
         },
         loading: () => const LoadingWidget(),
-        error: (_, __) => ErrorRetryWidget(
+        error: (_, _) => ErrorRetryWidget(
           message: 'Failed to load room members',
           onRetry: () =>
               ref.read(hallAdminAssignmentsProvider.notifier).fetch(),

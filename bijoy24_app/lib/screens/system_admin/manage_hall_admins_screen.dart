@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../providers/system_admin_provider.dart';
-import '../../widgets/empty_state_widget.dart';
 import '../../widgets/loading_widget.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/status_badge.dart';
+import '../../widgets/empty_state_widget.dart';
 import '../../widgets/confirmation_dialog.dart';
 
 class ManageHallAdminsScreen extends ConsumerStatefulWidget {
@@ -30,19 +33,26 @@ class _ManageHallAdminsScreenState
     final state = ref.watch(sysAdminHallAdminsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Hall Administrators')),
+      appBar: const GradientAppBar(title: 'Hall Admins'),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/system-admin/admins/create'),
-        icon: const Icon(Icons.person_add),
-        label: const Text('New Admin'),
+        onPressed: () => context.go('/system-admin/hall-admins/create'),
+        icon: const Icon(Icons.person_add_rounded),
+        label: const Text('Add Admin'),
       ),
       body: state.when(
+        loading: () => const LoadingWidget(),
+        error: (e, _) => ErrorRetryWidget(
+          message: 'Failed to load admins',
+          onRetry: () => ref.read(sysAdminHallAdminsProvider.notifier).fetch(),
+        ),
         data: (admins) {
           if (admins.isEmpty) {
-            return const EmptyStateWidget(
-              icon: Icons.admin_panel_settings_outlined,
-              title: 'No Hall Admins',
-              subtitle: 'Tap + to create a new hall admin',
+            return EmptyStateWidget(
+              icon: Icons.admin_panel_settings_rounded,
+              title: 'No Admins Yet',
+              subtitle: 'Add your first hall admin to get started.',
+              actionLabel: 'Add Admin',
+              onAction: () => context.go('/system-admin/hall-admins/create'),
             );
           }
           return RefreshIndicator(
@@ -53,99 +63,96 @@ class _ManageHallAdminsScreenState
               itemCount: admins.length,
               itemBuilder: (ctx, i) {
                 final admin = admins[i];
-                return Card(
+                return AppCard(
                   margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: CircleAvatar(
+                      backgroundColor: AppColors.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      child: Text(
+                        admin.adminName.isNotEmpty
+                            ? admin.adminName[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      admin.adminName,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (admin.email != null)
+                          Text(
+                            admin.email!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        const SizedBox(height: 4),
                         Row(
                           children: [
-                            CircleAvatar(
-                              backgroundColor: AppColors.primary,
-                              child: Text(
-                                (admin.adminName ?? 'A')
-                                    .substring(0, 1)
-                                    .toUpperCase(),
-                                style: const TextStyle(color: Colors.white),
+                            if (admin.hallName != null)
+                              Flexible(
+                                child: Text(
+                                  admin.hallName!,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    admin.adminName ?? 'Admin #${admin.hallAdminId}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    admin.email ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: AppColors.textSecondary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            PopupMenuButton<String>(
-                              onSelected: (a) =>
-                                  _handleAction(a, admin.hallAdminId),
-                              itemBuilder: (_) => [
-                                const PopupMenuItem(
-                                  value: 'edit',
-                                  child: Text('Edit'),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'token',
-                                  child: Text('View Token'),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'delete',
-                                  child: Text(
-                                    'Delete',
-                                    style: TextStyle(color: AppColors.error),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.apartment,
-                              size: 14,
-                              color: AppColors.textSecondary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              admin.hallName ??
-                                  'Hall #${admin.hallId ?? 'N/A'}',
-                              style: const TextStyle(fontSize: 13),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.phone,
-                              size: 14,
-                              color: AppColors.textSecondary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              admin.phone ?? 'N/A',
-                              style: const TextStyle(fontSize: 13),
-                            ),
+                            const SizedBox(width: 8),
+                            StatusBadge(status: admin.status, fontSize: 10),
                           ],
                         ),
                       ],
+                    ),
+                    trailing: PopupMenuButton(
+                      itemBuilder: (_) => [
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: ListTile(
+                            dense: true,
+                            leading: Icon(Icons.edit_rounded, size: 20),
+                            title: Text('Edit'),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: ListTile(
+                            dense: true,
+                            leading: Icon(
+                              Icons.delete_rounded,
+                              size: 20,
+                              color: Colors.red,
+                            ),
+                            title: Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ],
+                      onSelected: (v) {
+                        if (v == 'edit') {
+                          context.go(
+                            '/system-admin/hall-admins/${admin.hallAdminId}/edit',
+                          );
+                        } else if (v == 'delete') {
+                          _confirmDelete(admin.hallAdminId, admin.adminName);
+                        }
+                      },
                     ),
                   ),
                 );
@@ -153,80 +160,20 @@ class _ManageHallAdminsScreenState
             ),
           );
         },
-        loading: () => const LoadingWidget(),
-        error: (_, __) => ErrorRetryWidget(
-          message: 'Failed to load hall admins',
-          onRetry: () => ref.read(sysAdminHallAdminsProvider.notifier).fetch(),
-        ),
       ),
     );
   }
 
-  void _handleAction(String action, int adminId) {
-    switch (action) {
-      case 'edit':
-        context.push('/system-admin/admins/edit/$adminId');
-        break;
-      case 'token':
-        _showToken(adminId);
-        break;
-      case 'delete':
-        _deleteAdmin(adminId);
-        break;
-    }
-  }
-
-  Future<void> _showToken(int adminId) async {
-    // In production, fetch token from API
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Registration Token'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Share this 12-character token with the hall admin:'),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.2),
-                ),
-              ),
-              child: SelectableText(
-                'TOKEN-$adminId-XY',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _deleteAdmin(int adminId) async {
-    final confirmed = await showConfirmationDialog(
+  Future<void> _confirmDelete(int id, String name) async {
+    final ok = await showConfirmationDialog(
       context,
-      title: 'Delete Hall Admin',
-      message: 'Remove this hall administrator permanently?',
+      title: 'Delete Admin',
+      message: 'Remove "$name" permanently? This action cannot be undone.',
       confirmText: 'Delete',
-      confirmColor: AppColors.error,
+      confirmColor: Colors.red,
     );
-    if (confirmed == true) {
-      await ref.read(sysAdminHallAdminsProvider.notifier).delete(adminId);
+    if (ok == true && mounted) {
+      await ref.read(sysAdminHallAdminsProvider.notifier).delete(id);
     }
   }
 }

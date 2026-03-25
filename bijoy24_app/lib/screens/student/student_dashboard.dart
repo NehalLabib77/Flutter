@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../constants/app_colors.dart';
-import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/stat_card.dart';
 
@@ -30,30 +29,42 @@ class _StudentDashboardState extends ConsumerState<StudentDashboard> {
 
     return Scaffold(
       body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (i) {
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (i) {
           setState(() => _currentIndex = i);
           context.go(_tabs[i]);
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.meeting_room),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home_rounded),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.meeting_room_outlined),
+            selectedIcon: Icon(Icons.meeting_room_rounded),
             label: 'Room',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.build),
+          NavigationDestination(
+            icon: Icon(Icons.build_outlined),
+            selectedIcon: Icon(Icons.build_rounded),
             label: 'Maintenance',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline_rounded),
+            selectedIcon: Icon(Icons.person_rounded),
+            label: 'Profile',
+          ),
         ],
       ),
       drawer: Drawer(
         child: ListView(
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(color: AppColors.primary),
+              decoration: const BoxDecoration(
+                gradient: AppColors.primaryGradient,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -161,111 +172,141 @@ class StudentHomeScreen extends ConsumerWidget {
     final auth = ref.watch(authProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.appName),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {},
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome
-              Text(
-                'Welcome, ${auth.user?.name ?? 'Student'}!',
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: _buildHeader(auth, ref, context)),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+            sliver: SliverGrid.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 1.1,
+              children: [
+                StatCard(
+                  label: 'Room Status',
+                  value: '--',
+                  icon: Icons.meeting_room_rounded,
+                  color: AppColors.info,
+                  onTap: () => context.push('/student/roommates'),
                 ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Here\'s your hall overview',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 20),
-
-              // Stat cards
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.2,
+                StatCard(
+                  label: 'Seat Status',
+                  value: '--',
+                  icon: Icons.event_seat_rounded,
+                  color: AppColors.accent,
+                  onTap: () => context.push('/student/seat-booking'),
+                ),
+                StatCard(
+                  label: 'Maintenance',
+                  value: '0',
+                  icon: Icons.build_rounded,
+                  color: AppColors.pending,
+                  onTap: () => context.go('/student/maintenance'),
+                ),
+                StatCard(
+                  label: 'Room Change',
+                  value: '--',
+                  icon: Icons.swap_horiz_rounded,
+                  color: AppColors.primary,
+                  onTap: () => context.push('/student/room-change'),
+                ),
+              ],
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            sliver: SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  StatCard(
-                    title: 'Room Status',
-                    value: '--',
-                    icon: Icons.meeting_room,
-                    color: AppColors.info,
-                    onTap: () => context.push('/student/roommates'),
+                  const Text(
+                    'Quick Actions',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
-                  StatCard(
-                    title: 'Seat Status',
-                    value: '--',
-                    icon: Icons.event_seat,
-                    color: AppColors.accent,
+                  const SizedBox(height: 12),
+                  _QuickActionButton(
+                    icon: Icons.add_home_rounded,
+                    label: 'Apply for Room',
+                    color: AppColors.primary,
+                    onTap: () => context.go('/student/apply-room'),
+                  ),
+                  _QuickActionButton(
+                    icon: Icons.event_seat_rounded,
+                    label: 'Book a Seat',
+                    color: AppColors.info,
                     onTap: () => context.push('/student/seat-booking'),
                   ),
-                  StatCard(
-                    title: 'Maintenance',
-                    value: '0',
-                    icon: Icons.build,
-                    color: AppColors.pending,
-                    onTap: () => context.go('/student/maintenance'),
+                  _QuickActionButton(
+                    icon: Icons.report_problem_rounded,
+                    label: 'Report Issue',
+                    color: AppColors.warning,
+                    onTap: () => context.push('/student/submit-maintenance'),
                   ),
-                  StatCard(
-                    title: 'Room Change',
-                    value: '--',
-                    icon: Icons.swap_horiz,
-                    color: AppColors.primary,
+                  _QuickActionButton(
+                    icon: Icons.swap_horiz_rounded,
+                    label: 'Request Room Change',
+                    color: AppColors.approved,
                     onTap: () => context.push('/student/room-change'),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-
-              // Quick Actions
-              const Text(
-                'Quick Actions',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              _QuickActionButton(
-                icon: Icons.add_home,
-                label: 'Apply for Room',
-                color: AppColors.primary,
-                onTap: () => context.go('/student/apply-room'),
-              ),
-              _QuickActionButton(
-                icon: Icons.event_seat,
-                label: 'Book a Seat',
-                color: AppColors.info,
-                onTap: () => context.push('/student/seat-booking'),
-              ),
-              _QuickActionButton(
-                icon: Icons.report_problem,
-                label: 'Report Issue',
-                color: AppColors.warning,
-                onTap: () => context.push('/student/submit-maintenance'),
-              ),
-              _QuickActionButton(
-                icon: Icons.swap_horiz,
-                label: 'Request Room Change',
-                color: AppColors.approved,
-                onTap: () => context.push('/student/room-change'),
-              ),
-            ],
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(AuthState auth, WidgetRef ref, BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
+      decoration: const BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Row(
+          children: [
+            const CircleAvatar(
+              radius: 24,
+              backgroundColor: Colors.white24,
+              child: Icon(Icons.school_rounded, color: Colors.white),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Hi, ${auth.user?.name ?? 'Student'}!',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    'Here\'s your hall overview',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                ref.read(authProvider.notifier).logout();
+                context.go('/login');
+              },
+              icon: const Icon(Icons.logout, color: Colors.white),
+              tooltip: 'Logout',
+            ),
+          ],
         ),
       ),
     );

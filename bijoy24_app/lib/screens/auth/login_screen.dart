@@ -213,11 +213,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
+  void _onRoleSelected(String role) {
+    setState(() => _selectedRole = role);
+    if (role == AppStrings.roleSystemAdmin) {
+      _usernameController.text = 'System';
+      _passwordController.text = 'admin123';
+    } else if (role == AppStrings.roleHallAdmin) {
+      _usernameController.text = 'HallAdmin';
+      _passwordController.text = 'admin123';
+    } else if (role == AppStrings.roleStudent) {
+      _usernameController.text = 'student';
+      _passwordController.text = 'student123';
+    } else {
+      _usernameController.clear();
+      _passwordController.clear();
+    }
+  }
+
   Widget _roleTab(String role, String label) {
     final isSelected = _selectedRole == role;
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => _selectedRole = role),
+        onTap: () => _onRoleSelected(role),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 12),

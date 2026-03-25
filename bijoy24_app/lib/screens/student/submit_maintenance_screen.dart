@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/student_provider.dart';
 
@@ -61,7 +62,7 @@ class _SubmitMaintenanceScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Report Maintenance Issue')),
+      appBar: const GradientAppBar(title: 'Report Maintenance Issue'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(

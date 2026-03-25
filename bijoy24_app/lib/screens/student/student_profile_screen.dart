@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/student_provider.dart';
 import '../../widgets/loading_widget.dart';
@@ -66,8 +67,8 @@ class _StudentProfileScreenState extends ConsumerState<StudentProfileScreen> {
     final state = ref.watch(studentProfileProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Profile'),
+      appBar: GradientAppBar(
+        title: 'My Profile',
         actions: [
           if (!_editing)
             IconButton(

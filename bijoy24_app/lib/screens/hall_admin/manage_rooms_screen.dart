@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../providers/hall_admin_provider.dart';
+import '../../widgets/app_card.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/confirmation_dialog.dart';
@@ -15,14 +17,12 @@ class ManageRoomsScreen extends ConsumerStatefulWidget {
 }
 
 class _ManageRoomsScreenState extends ConsumerState<ManageRoomsScreen> {
-  String _statusFilter = 'All';
+  String _filter = 'All';
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref.read(hallAdminRoomsProvider.notifier).fetch(),
-    );
+    Future.microtask(() => ref.read(hallAdminRoomsProvider.notifier).fetch());
   }
 
   @override
@@ -30,12 +30,12 @@ class _ManageRoomsScreenState extends ConsumerState<ManageRoomsScreen> {
     final state = ref.watch(hallAdminRoomsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage Rooms'),
+      appBar: GradientAppBar(
+        title: 'Manage Rooms',
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list),
-            onSelected: (v) => setState(() => _statusFilter = v),
+            icon: const Icon(Icons.filter_list_rounded),
+            onSelected: (v) => setState(() => _filter = v),
             itemBuilder: (_) => [
               'All',
               'Available',
@@ -47,14 +47,14 @@ class _ManageRoomsScreenState extends ConsumerState<ManageRoomsScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/hall-admin/rooms/create'),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_rounded),
         label: const Text('Add Room'),
       ),
       body: state.when(
         data: (rooms) {
-          final filtered = _statusFilter == 'All'
+          final filtered = _filter == 'All'
               ? rooms
-              : rooms.where((r) => r.status == _statusFilter).toList();
+              : rooms.where((r) => r.status == _filter).toList();
           if (filtered.isEmpty) {
             return const EmptyStateWidget(
               icon: Icons.meeting_room_outlined,
@@ -63,77 +63,112 @@ class _ManageRoomsScreenState extends ConsumerState<ManageRoomsScreen> {
             );
           }
           return RefreshIndicator(
-            onRefresh: () =>
-                ref.read(hallAdminRoomsProvider.notifier).fetch(),
+            onRefresh: () => ref.read(hallAdminRoomsProvider.notifier).fetch(),
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: filtered.length,
               itemBuilder: (ctx, i) {
                 final room = filtered[i];
-                final occupancy = room.roomCapacity - room.availableSlots;
-                final capacity = room.roomCapacity;
-                final pct = capacity > 0 ? occupancy / capacity : 0.0;
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: _statusColor(room.status),
-                      child: Text(
-                        room.roomNumber ?? '-',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                final occupied = room.roomCapacity - room.availableSlots;
+                final pct = room.roomCapacity > 0
+                    ? occupied / room.roomCapacity
+                    : 0.0;
+                return AppCard(
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          _roomIcon(room.status, room.roomNumber),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  room.roomName ??
+                                      'Room ${room.roomNumber ?? room.roomId}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Floor ${room.floor ?? '-'} • ${room.wing ?? '-'} Wing',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          PopupMenuButton<String>(
+                            onSelected: (a) => _handleAction(a, room.roomId),
+                            itemBuilder: (_) => [
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              const PopupMenuItem(
+                                value: 'members',
+                                child: Text('View Members'),
+                              ),
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text(
+                                  'Delete',
+                                  style: TextStyle(color: AppColors.error),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: LinearProgressIndicator(
+                          value: pct,
+                          minHeight: 6,
+                          backgroundColor: AppColors.divider,
+                          valueColor: AlwaysStoppedAnimation(
+                            pct >= 1.0 ? AppColors.error : AppColors.primary,
+                          ),
                         ),
                       ),
-                    ),
-                    title: Text(
-                      room.roomName ?? 'Room ${room.roomNumber}',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Floor ${room.floor ?? '-'} • ${room.wing ?? '-'} Wing • Block ${room.block ?? '-'}',
-                        ),
-                        const SizedBox(height: 4),
-                        LinearProgressIndicator(
-                          value: pct,
-                          backgroundColor: Colors.grey.shade200,
-                          valueColor: AlwaysStoppedAnimation(
-                            pct >= 1 ? AppColors.error : AppColors.primary,
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '$occupied / ${room.roomCapacity} occupied',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '$occupancy / $capacity occupied',
-                          style: const TextStyle(fontSize: 11),
-                        ),
-                      ],
-                    ),
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (action) =>
-                          _handleAction(action, room.roomId),
-                      itemBuilder: (_) => [
-                        const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                        const PopupMenuItem(
-                          value: 'members',
-                          child: Text('View Members'),
-                        ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Text(
-                            'Delete',
-                            style: TextStyle(color: AppColors.error),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.getStatusBg(room.status),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              room.status,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.getStatusColor(room.status),
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    isThreeLine: true,
+                        ],
+                      ),
+                    ],
                   ),
                 );
               },
@@ -141,7 +176,7 @@ class _ManageRoomsScreenState extends ConsumerState<ManageRoomsScreen> {
           );
         },
         loading: () => const LoadingWidget(),
-        error: (_, __) => ErrorRetryWidget(
+        error: (_, _) => ErrorRetryWidget(
           message: 'Failed to load rooms',
           onRetry: () => ref.read(hallAdminRoomsProvider.notifier).fetch(),
         ),
@@ -149,17 +184,26 @@ class _ManageRoomsScreenState extends ConsumerState<ManageRoomsScreen> {
     );
   }
 
-  Color _statusColor(String? status) {
-    switch (status) {
-      case 'Available':
-        return AppColors.approved;
-      case 'Full':
-        return AppColors.error;
-      case 'Maintenance':
-        return AppColors.warning;
-      default:
-        return AppColors.textSecondary;
-    }
+  Widget _roomIcon(String status, String? number) {
+    final color = AppColors.getStatusColor(status);
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Center(
+        child: Text(
+          number ?? '-',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
+        ),
+      ),
+    );
   }
 
   void _handleAction(String action, String roomId) {
@@ -180,8 +224,7 @@ class _ManageRoomsScreenState extends ConsumerState<ManageRoomsScreen> {
     final confirmed = await showConfirmationDialog(
       context,
       title: 'Delete Room',
-      message:
-          'This will permanently delete the room and displace any assigned students. Continue?',
+      message: 'This will permanently delete the room. Continue?',
       confirmText: 'Delete',
       confirmColor: AppColors.error,
     );

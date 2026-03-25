@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/gradient_app_bar.dart';
 import '../../providers/hall_admin_provider.dart';
-import '../../widgets/status_badge.dart';
+import '../../widgets/app_card.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/loading_widget.dart';
+import '../../widgets/status_badge.dart';
 import '../../widgets/confirmation_dialog.dart';
 
 class RoomChangeRequestsScreen extends ConsumerStatefulWidget {
@@ -30,13 +32,14 @@ class _RoomChangeRequestsScreenState
     final state = ref.watch(hallAdminRoomChangeProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Room Change Requests')),
+      appBar: const GradientAppBar(title: 'Room Change Requests'),
       body: state.when(
         data: (requests) {
           if (requests.isEmpty) {
             return const EmptyStateWidget(
-              icon: Icons.swap_horiz,
-              title: 'No Room Change Requests',
+              icon: Icons.swap_horiz_rounded,
+              title: 'No Requests',
+              subtitle: 'Room change requests will appear here',
             );
           }
           return RefreshIndicator(
@@ -47,98 +50,106 @@ class _RoomChangeRequestsScreenState
               itemCount: requests.length,
               itemBuilder: (ctx, i) {
                 final req = requests[i];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                req.studentName ?? 'Student #${req.studentId}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                return AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: AppColors.pendingBg,
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            StatusBadge(status: req.status),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _roomCard(
-                                'Current',
-                                'Room ${req.currentRoom ?? '-'}',
-                                AppColors.error.withValues(alpha: 0.1),
-                              ),
+                            child: const Icon(
+                              Icons.swap_horiz_rounded,
+                              color: AppColors.pending,
+                              size: 22,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Icon(
-                                Icons.arrow_forward,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            Expanded(
-                              child: _roomCard(
-                                'Requested',
-                                'Room ${req.requestedRoomNumber ?? req.requestedRoomId}',
-                                AppColors.approved.withValues(alpha: 0.1),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Reason: ${req.reason ?? 'N/A'}',
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                        Text(
-                          'Date: ${req.requestDate.toString().split(' ')[0]}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
                           ),
-                        ),
-                        if (req.status == 'Pending') ...[
-                          const Divider(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: AppColors.error,
-                                    side: const BorderSide(
-                                      color: AppColors.error,
-                                    ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  req.studentName ?? 'Student',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
                                   ),
-                                  onPressed: () => _reject(req.requestId),
-                                  child: const Text('Reject'),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.approved,
+                                Text(
+                                  '${req.currentRoom ?? 'Current'} → ${req.requestedRoomNumber ?? req.requestedRoomId}',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
                                   ),
-                                  onPressed: () => _approve(req.requestId),
-                                  child: const Text('Approve'),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                          StatusBadge(status: req.status),
                         ],
+                      ),
+                      if (req.reason != null && req.reason!.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            req.reason!,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
                       ],
-                    ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Requested: ${req.requestDate.toString().split(' ').first}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textTertiary,
+                        ),
+                      ),
+                      if (req.status == 'Pending') ...[
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () =>
+                                    _process(req.requestId, 'Rejected'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.error,
+                                  side: const BorderSide(
+                                    color: AppColors.error,
+                                  ),
+                                ),
+                                child: const Text('Reject'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: FilledButton(
+                                onPressed: () =>
+                                    _process(req.requestId, 'Approved'),
+                                child: const Text('Approve'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
                   ),
                 );
               },
@@ -146,7 +157,7 @@ class _RoomChangeRequestsScreenState
           );
         },
         loading: () => const LoadingWidget(),
-        error: (_, __) => ErrorRetryWidget(
+        error: (_, _) => ErrorRetryWidget(
           message: 'Failed to load room change requests',
           onRetry: () => ref.read(hallAdminRoomChangeProvider.notifier).fetch(),
         ),
@@ -154,51 +165,14 @@ class _RoomChangeRequestsScreenState
     );
   }
 
-  Widget _roomCard(String label, String room, Color bg) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          Text(room, style: const TextStyle(fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _approve(int id) async {
-    final confirmed = await showConfirmationDialog(
-      context,
-      title: 'Approve Room Change',
-      message: 'Approve this room change request?',
-      confirmText: 'Approve',
-      confirmColor: AppColors.approved,
-    );
-    if (confirmed == true) {
-      await ref.read(hallAdminRoomChangeProvider.notifier).process(id, {
-        'status': 'Approved',
-      });
-    }
-  }
-
-  Future<void> _reject(int id) async {
+  Future<void> _process(int id, String status) async {
     final remarks = await showRemarksDialog(
       context,
-      title: 'Reject Room Change',
+      title: '$status — Add Remarks',
     );
     if (remarks != null) {
       await ref.read(hallAdminRoomChangeProvider.notifier).process(id, {
-        'status': 'Rejected',
+        'status': status,
         'adminRemarks': remarks,
       });
     }
