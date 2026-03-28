@@ -6,6 +6,7 @@ import '../../constants/app_strings.dart';
 import '../../providers/hall_provider.dart';
 import '../../providers/student_provider.dart';
 import '../../widgets/empty_state_widget.dart';
+import '../../widgets/seat_position_selector.dart';
 
 class ApplyRoomScreen extends ConsumerStatefulWidget {
   const ApplyRoomScreen({super.key});
@@ -16,12 +17,20 @@ class ApplyRoomScreen extends ConsumerStatefulWidget {
 
 class _ApplyRoomScreenState extends ConsumerState<ApplyRoomScreen> {
   int? _selectedHallId;
+  SeatPosition? _selectedSeatPosition;
+  final _reasonController = TextEditingController();
   bool _submitting = false;
 
   @override
   void initState() {
     super.initState();
     Future.microtask(() => ref.read(hallListProvider.notifier).fetch());
+  }
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
   }
 
   Future<void> _submit() async {
@@ -32,9 +41,27 @@ class _ApplyRoomScreenState extends ConsumerState<ApplyRoomScreen> {
       return;
     }
 
+    if (_selectedSeatPosition == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a seat preference')),
+      );
+      return;
+    }
+
+    if (_reasonController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please provide a reason for your request'),
+        ),
+      );
+      return;
+    }
+
     setState(() => _submitting = true);
     final success = await ref.read(roomApplicationProvider.notifier).submit({
       'hallId': _selectedHallId,
+      'seatPosition': _selectedSeatPosition!.toApiValue(),
+      'reason': _reasonController.text.trim(),
     });
 
     if (mounted) {
@@ -208,7 +235,51 @@ class _ApplyRoomScreenState extends ConsumerState<ApplyRoomScreen> {
               error: (_, __) => const Text('Failed to load halls'),
             ),
 
+            const SizedBox(height: 28),
+            const Text(
+              'Select Your Seat Preference',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Choose your preferred seat location in the room',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            SeatPositionSelector(
+              selectedPosition: _selectedSeatPosition,
+              onSelect: (position) =>
+                  setState(() => _selectedSeatPosition = position),
+              enabled: _selectedHallId != null,
+            ),
+
             const SizedBox(height: 24),
+            const Text(
+              'Reason for Request',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Tell us why you prefer this seat location',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _reasonController,
+              maxLines: 3,
+              minLines: 2,
+              enabled: _selectedHallId != null && _selectedSeatPosition != null,
+              decoration: InputDecoration(
+                hintText:
+                    'E.g., Near the window for better ventilation, closer to facilities, etc.',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: const EdgeInsets.all(14),
+              ),
+            ),
+
+            const SizedBox(height: 28),
             SizedBox(
               height: 52,
               child: ElevatedButton(

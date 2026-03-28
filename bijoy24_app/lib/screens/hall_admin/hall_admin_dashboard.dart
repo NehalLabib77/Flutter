@@ -14,120 +14,8 @@ class HallAdminDashboardShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authProvider);
-
     return Scaffold(
       body: child,
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                gradient: AppColors.primaryGradient,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 28,
-                    child: Icon(
-                      Icons.admin_panel_settings_rounded,
-                      size: 32,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    auth.user?.name ?? 'Hall Admin',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    'Hall Admin',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Dashboard'),
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/hall-admin');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.meeting_room),
-              title: const Text('Manage Rooms'),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/hall-admin/rooms');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.assignment_rounded),
-              title: const Text('Room Applications'),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/hall-admin/room-applications');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.event_seat_rounded),
-              title: const Text('Seat Applications'),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/hall-admin/seat-applications');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.people_rounded),
-              title: const Text('Room Assignments'),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/hall-admin/assignments');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.swap_horiz_rounded),
-              title: const Text('Room Changes'),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/hall-admin/room-changes');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.build_circle_rounded),
-              title: const Text('Maintenance'),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/hall-admin/maintenance');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: AppColors.error),
-              title: const Text(
-                'Logout',
-                style: TextStyle(color: AppColors.error),
-              ),
-              onTap: () {
-                ref.read(authProvider.notifier).logout();
-                context.go('/login');
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -275,11 +163,23 @@ class _HallAdminHomeScreenState extends ConsumerState<HallAdminHomeScreen> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    // Logout and clear auth state
+                    await ref.read(authProvider.notifier).logout();
+                    
+                    // Give a small delay to ensure state is updated
+                    await Future.delayed(const Duration(milliseconds: 100));
+                    
+                    // Navigate to login page
+                    if (context.mounted) {
+                      context.go('/login');
+                    }
+                  },
                   icon: const Icon(
-                    Icons.notifications_none_rounded,
+                    Icons.logout_rounded,
                     color: Colors.white,
                   ),
+                  tooltip: 'Logout',
                 ),
               ],
             ),

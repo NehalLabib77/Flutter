@@ -29,9 +29,10 @@ class _SystemAdminHomeScreenState extends ConsumerState<SystemAdminHomeScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref.read(sysAdminDashboardProvider.notifier).fetch(),
-    );
+    Future.microtask(() {
+      ref.read(sysAdminDashboardProvider.notifier).fetch();
+      ref.read(sysAdminHallAdminsProvider.notifier).fetch();
+    });
   }
 
   @override

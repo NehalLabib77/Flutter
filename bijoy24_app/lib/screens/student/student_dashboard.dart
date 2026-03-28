@@ -25,15 +25,22 @@ class _StudentDashboardState extends ConsumerState<StudentDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = ref.watch(authProvider);
-
     return Scaffold(
       body: widget.child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (i) {
-          setState(() => _currentIndex = i);
-          context.go(_tabs[i]);
+        onDestinationSelected: (i) async {
+          if (i == 3) {
+            // Logout
+            await ref.read(authProvider.notifier).logout();
+            await Future.delayed(const Duration(milliseconds: 100));
+            if (mounted) {
+              context.go('/login');
+            }
+          } else {
+            setState(() => _currentIndex = i);
+            context.go(_tabs[i]);
+          }
         },
         destinations: const [
           NavigationDestination(
@@ -52,113 +59,11 @@ class _StudentDashboardState extends ConsumerState<StudentDashboard> {
             label: 'Maintenance',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded),
-            selectedIcon: Icon(Icons.person_rounded),
-            label: 'Profile',
+            icon: Icon(Icons.logout_outlined),
+            selectedIcon: Icon(Icons.logout_rounded),
+            label: 'Logout',
           ),
         ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                gradient: AppColors.primaryGradient,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 28,
-                    child: Icon(
-                      Icons.person,
-                      size: 32,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    auth.user?.name ?? 'Student',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    'Student',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Dashboard'),
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/student');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.meeting_room),
-              title: const Text('Apply for Room'),
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/student/apply-room');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.event_seat),
-              title: const Text('Seat Booking'),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/student/seat-booking');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.people),
-              title: const Text('My Roommates'),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/student/roommates');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.swap_horiz),
-              title: const Text('Room Change'),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/student/room-change');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.build),
-              title: const Text('Maintenance'),
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/student/maintenance');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: AppColors.error),
-              title: const Text(
-                'Logout',
-                style: TextStyle(color: AppColors.error),
-              ),
-              onTap: () {
-                ref.read(authProvider.notifier).logout();
-                context.go('/login');
-              },
-            ),
-          ],
-        ),
       ),
     );
   }

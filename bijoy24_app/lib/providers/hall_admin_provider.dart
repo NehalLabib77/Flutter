@@ -395,13 +395,16 @@ class HallAdminRoomAppsNotifier
       final response = await _api.getHallAdminRoomApplications();
       final list = (response.data as List)
           .map((e) => RoomApplication.fromJson(e))
+          .where((a) => a.status == 'Pending')
           .toList();
       _mockMode = false;
       state = AsyncValue.data(list);
     } catch (e, st) {
       if (_isNetworkError(e)) {
         _mockMode = true;
-        _mockList = _mockRoomApps();
+        _mockList = _mockRoomApps()
+            .where((a) => a.status == 'Pending')
+            .toList();
         state = AsyncValue.data(List.from(_mockList));
       } else {
         state = AsyncValue.error(e, st);
@@ -411,24 +414,7 @@ class HallAdminRoomAppsNotifier
 
   Future<bool> approve(int id, Map<String, dynamic> data) async {
     if (_mockMode) {
-      _mockList = _mockList
-          .map(
-            (a) => a.applicationId == id
-                ? RoomApplication(
-                    applicationId: a.applicationId,
-                    studentId: a.studentId,
-                    hallId: a.hallId,
-                    status: 'Approved',
-                    applicationDate: a.applicationDate,
-                    adminRemarks: data['remarks'] as String?,
-                    studentName: a.studentName,
-                    hallName: a.hallName,
-                    faculty: a.faculty,
-                    semester: a.semester,
-                  )
-                : a,
-          )
-          .toList();
+      _mockList = _mockList.where((a) => a.applicationId != id).toList();
       state = AsyncValue.data(List.from(_mockList));
       return true;
     }
@@ -443,24 +429,7 @@ class HallAdminRoomAppsNotifier
 
   Future<bool> reject(int id, Map<String, dynamic> data) async {
     if (_mockMode) {
-      _mockList = _mockList
-          .map(
-            (a) => a.applicationId == id
-                ? RoomApplication(
-                    applicationId: a.applicationId,
-                    studentId: a.studentId,
-                    hallId: a.hallId,
-                    status: 'Rejected',
-                    applicationDate: a.applicationDate,
-                    adminRemarks: data['remarks'] as String?,
-                    studentName: a.studentName,
-                    hallName: a.hallName,
-                    faculty: a.faculty,
-                    semester: a.semester,
-                  )
-                : a,
-          )
-          .toList();
+      _mockList = _mockList.where((a) => a.applicationId != id).toList();
       state = AsyncValue.data(List.from(_mockList));
       return true;
     }
@@ -495,13 +464,16 @@ class HallAdminSeatAppsNotifier
       final response = await _api.getHallAdminSeatApplications();
       final list = (response.data as List)
           .map((e) => SeatApplication.fromJson(e))
+          .where((a) => a.status == 'Pending')
           .toList();
       _mockMode = false;
       state = AsyncValue.data(list);
     } catch (e, st) {
       if (_isNetworkError(e)) {
         _mockMode = true;
-        _mockList = _mockSeatApps();
+        _mockList = _mockSeatApps()
+            .where((a) => a.status == 'Pending')
+            .toList();
         state = AsyncValue.data(List.from(_mockList));
       } else {
         state = AsyncValue.error(e, st);
@@ -511,29 +483,7 @@ class HallAdminSeatAppsNotifier
 
   Future<bool> approve(int id, Map<String, dynamic> data) async {
     if (_mockMode) {
-      _mockList = _mockList
-          .map(
-            (a) => a.applicationId == id
-                ? SeatApplication(
-                    applicationId: a.applicationId,
-                    studentId: a.studentId,
-                    seatId: a.seatId,
-                    hallId: a.hallId,
-                    roomId: a.roomId,
-                    applicationDate: a.applicationDate,
-                    status: 'Approved',
-                    adminRemarks: data['remarks'] as String?,
-                    studentName: a.studentName,
-                    roomNumber: a.roomNumber,
-                    seatType: a.seatType,
-                    seatNumber: a.seatNumber,
-                    academicYear: a.academicYear,
-                    semester: a.semester,
-                    processedDate: DateTime.now(),
-                  )
-                : a,
-          )
-          .toList();
+      _mockList = _mockList.where((a) => a.applicationId != id).toList();
       state = AsyncValue.data(List.from(_mockList));
       return true;
     }
@@ -548,29 +498,7 @@ class HallAdminSeatAppsNotifier
 
   Future<bool> reject(int id, Map<String, dynamic> data) async {
     if (_mockMode) {
-      _mockList = _mockList
-          .map(
-            (a) => a.applicationId == id
-                ? SeatApplication(
-                    applicationId: a.applicationId,
-                    studentId: a.studentId,
-                    seatId: a.seatId,
-                    hallId: a.hallId,
-                    roomId: a.roomId,
-                    applicationDate: a.applicationDate,
-                    status: 'Rejected',
-                    adminRemarks: data['remarks'] as String?,
-                    studentName: a.studentName,
-                    roomNumber: a.roomNumber,
-                    seatType: a.seatType,
-                    seatNumber: a.seatNumber,
-                    academicYear: a.academicYear,
-                    semester: a.semester,
-                    processedDate: DateTime.now(),
-                  )
-                : a,
-          )
-          .toList();
+      _mockList = _mockList.where((a) => a.applicationId != id).toList();
       state = AsyncValue.data(List.from(_mockList));
       return true;
     }

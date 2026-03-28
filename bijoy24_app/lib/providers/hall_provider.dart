@@ -33,6 +33,19 @@ class RoomListNotifier extends StateNotifier<AsyncValue<List<Room>>> {
 
   RoomListNotifier() : super(const AsyncValue.loading());
 
+  Future<void> fetch() async {
+    state = const AsyncValue.loading();
+    try {
+      final response = await _api.getHallRooms(-1);
+      final list = (response.data as List)
+          .map((e) => Room.fromJson(e))
+          .toList();
+      state = AsyncValue.data(list);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> fetchForHall(int hallId) async {
     state = const AsyncValue.loading();
     try {

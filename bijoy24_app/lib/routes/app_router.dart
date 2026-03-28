@@ -180,7 +180,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'rooms/edit/:id',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (ctx, state) {
-                  final id = int.parse(state.pathParameters['id'] ?? '0');
+                  final id = state.pathParameters['id'] ?? '';
                   return EditRoomScreen(roomId: id);
                 },
               ),
@@ -188,7 +188,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'rooms/:id/members',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (ctx, state) {
-                  final id = int.parse(state.pathParameters['id'] ?? '0');
+                  final id = state.pathParameters['id'] ?? '';
                   return ViewRoomMembersScreen(roomId: id);
                 },
               ),

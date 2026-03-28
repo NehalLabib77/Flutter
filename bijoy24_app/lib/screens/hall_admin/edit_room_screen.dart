@@ -6,7 +6,7 @@ import '../../providers/hall_admin_provider.dart';
 import '../../widgets/loading_widget.dart';
 
 class EditRoomScreen extends ConsumerStatefulWidget {
-  final int roomId;
+  final String roomId;
   const EditRoomScreen({super.key, required this.roomId});
 
   @override

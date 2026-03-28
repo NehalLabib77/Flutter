@@ -8,7 +8,7 @@ import '../../widgets/empty_state_widget.dart';
 import '../../widgets/loading_widget.dart';
 
 class ViewRoomMembersScreen extends ConsumerStatefulWidget {
-  final int roomId;
+  final String roomId;
   const ViewRoomMembersScreen({super.key, required this.roomId});
 
   @override
@@ -30,11 +30,11 @@ class _ViewRoomMembersScreenState extends ConsumerState<ViewRoomMembersScreen> {
     final state = ref.watch(hallAdminAssignmentsProvider);
 
     return Scaffold(
-      appBar: GradientAppBar(title: 'Room #${widget.roomId} Members'),
+      appBar: GradientAppBar(title: 'Room ${widget.roomId} Members'),
       body: state.when(
         data: (all) {
           final members = all
-              .where((a) => a.roomIdentity.contains(widget.roomId.toString()))
+              .where((a) => a.roomIdentity.contains(widget.roomId))
               .toList();
           if (members.isEmpty) {
             return const EmptyStateWidget(
