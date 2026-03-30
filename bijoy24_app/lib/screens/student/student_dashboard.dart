@@ -31,7 +31,7 @@ class _StudentDashboardState extends ConsumerState<StudentDashboard> {
         selectedIndex: _currentIndex,
         onDestinationSelected: (i) async {
           if (i == 3) {
-            // Logout
+
             await ref.read(authProvider.notifier).logout();
             await Future.delayed(const Duration(milliseconds: 100));
             if (mounted) {

@@ -91,7 +91,7 @@ class _ApplyRoomScreenState extends ConsumerState<ApplyRoomScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Current application status
+
             appState.when(
               data: (app) {
                 if (app != null) {

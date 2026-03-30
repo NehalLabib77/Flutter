@@ -38,7 +38,7 @@ class _DatabaseStatsScreenState extends ConsumerState<DatabaseStatsScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              // Header
+
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -87,7 +87,6 @@ class _DatabaseStatsScreenState extends ConsumerState<DatabaseStatsScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Stats grid
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,

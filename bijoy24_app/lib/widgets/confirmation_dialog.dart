@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
-/// Modern confirmation dialog
 Future<bool?> showConfirmationDialog(
   BuildContext context, {
   required String title,
@@ -52,7 +51,6 @@ Future<bool?> showConfirmationDialog(
   );
 }
 
-/// Modern remarks dialog with text field
 Future<String?> showRemarksDialog(
   BuildContext context, {
   required String title,

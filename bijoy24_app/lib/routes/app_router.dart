@@ -4,12 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
 
-// Auth screens
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/student_registration_screen.dart';
 import '../screens/auth/hall_admin_registration_screen.dart';
 
-// Student screens
 import '../screens/student/student_dashboard.dart';
 import '../screens/student/apply_room_screen.dart';
 import '../screens/student/seat_booking_screen.dart';
@@ -19,7 +17,6 @@ import '../screens/student/maintenance_list_screen.dart';
 import '../screens/student/submit_maintenance_screen.dart';
 import '../screens/student/student_profile_screen.dart';
 
-// Hall Admin screens
 import '../screens/hall_admin/hall_admin_dashboard.dart';
 import '../screens/hall_admin/room_applications_screen.dart';
 import '../screens/hall_admin/seat_applications_screen.dart';
@@ -31,7 +28,6 @@ import '../screens/hall_admin/room_change_requests_screen.dart';
 import '../screens/hall_admin/maintenance_requests_screen.dart';
 import '../screens/hall_admin/view_room_members_screen.dart';
 
-// System Admin screens
 import '../screens/system_admin/system_admin_dashboard.dart';
 import '../screens/system_admin/manage_halls_screen.dart';
 import '../screens/system_admin/create_hall_screen.dart';
@@ -64,12 +60,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           state.uri.toString().startsWith('/login') ||
           state.uri.toString().startsWith('/register');
 
-      // If not authenticated, redirect to login
       if (!isAuth && !isLoginRoute) {
         return '/login';
       }
 
-      // If authenticated and on login, redirect to dashboard
       if (isAuth && isLoginRoute) {
         final role = authState.user?.role;
         switch (role) {
@@ -87,7 +81,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      // ─── Auth Routes ───────────────────────────────────────
+
       GoRoute(path: '/login', builder: (ctx, state) => const LoginScreen()),
       GoRoute(
         path: '/register/student',
@@ -98,7 +92,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (ctx, state) => const HallAdminRegistrationScreen(),
       ),
 
-      // ─── Student Routes ────────────────────────────────────
       ShellRoute(
         navigatorKey: _studentShellKey,
         builder: (ctx, state, child) => StudentDashboard(child: child),
@@ -147,7 +140,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
-      // ─── Hall Admin Routes ─────────────────────────────────
       ShellRoute(
         navigatorKey: _hallAdminShellKey,
         builder: (ctx, state, child) => HallAdminDashboardShell(child: child),
@@ -212,7 +204,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
-      // ─── System Admin Routes ───────────────────────────────
       ShellRoute(
         navigatorKey: _sysAdminShellKey,
         builder: (ctx, state, child) => SystemAdminDashboardShell(child: child),

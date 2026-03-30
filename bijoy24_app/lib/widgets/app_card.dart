@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
-/// A clean, modern card wrapper used across the app
 class AppCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -10,7 +9,7 @@ class AppCard extends StatelessWidget {
   final Color? borderColor;
 
   static const _shadow = BoxShadow(
-    color: Color(0x08000000), // black at ~3% opacity
+    color: Color(0x08000000),
     blurRadius: 10,
     offset: Offset(0, 2),
   );
@@ -45,7 +44,6 @@ class AppCard extends StatelessWidget {
   }
 }
 
-/// A modern section header used in lists
 class SectionHeader extends StatelessWidget {
   final String title;
   final String? trailing;
@@ -91,7 +89,6 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
-/// Gradient header card for dashboard tops
 class GradientHeader extends StatelessWidget {
   final String title;
   final String subtitle;

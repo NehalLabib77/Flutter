@@ -15,7 +15,7 @@ class SystemSettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Profile section
+
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(

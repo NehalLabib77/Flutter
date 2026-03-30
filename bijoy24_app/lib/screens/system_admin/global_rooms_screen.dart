@@ -35,7 +35,7 @@ class _GlobalRoomsScreenState extends ConsumerState<GlobalRoomsScreen> {
       appBar: const GradientAppBar(title: 'All Rooms'),
       body: Column(
         children: [
-          // Hall picker
+
           hallsState.when(
             loading: () => const Padding(
               padding: EdgeInsets.all(16),
@@ -76,7 +76,6 @@ class _GlobalRoomsScreenState extends ConsumerState<GlobalRoomsScreen> {
 
           const Divider(height: 1),
 
-          // Room list
           Expanded(
             child: _selectedHallId == null
                 ? const EmptyStateWidget(

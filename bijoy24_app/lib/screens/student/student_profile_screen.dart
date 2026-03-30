@@ -90,7 +90,7 @@ class _StudentProfileScreenState extends ConsumerState<StudentProfileScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // Avatar
+
                   CircleAvatar(
                     radius: 48,
                     backgroundColor: AppColors.primary.withValues(alpha: 0.1),
@@ -152,7 +152,6 @@ class _StudentProfileScreenState extends ConsumerState<StudentProfileScreen> {
             );
           }
 
-          // Edit mode
           _mobileCtrl.text = student.mobile;
           _emailCtrl.text = student.email ?? '';
           _emergencyNameCtrl.text = student.emergencyContactName ?? '';

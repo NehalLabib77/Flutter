@@ -68,7 +68,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                // Logo / Title
+
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -101,7 +101,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                // Role Selector
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.grey.shade100,
@@ -117,7 +116,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Username
                 TextFormField(
                   controller: _usernameController,
                   decoration: const InputDecoration(
@@ -129,7 +127,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Password
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
@@ -151,7 +148,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // Error message
                 if (authState.status == AuthStatus.error &&
                     authState.errorMessage != null)
                   Padding(
@@ -168,7 +164,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 const SizedBox(height: 24),
 
-                // Login Button
                 SizedBox(
                   height: 52,
                   child: ElevatedButton(
@@ -190,7 +185,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 const SizedBox(height: 20),
 
-                // Registration links
                 if (_selectedRole == AppStrings.roleStudent) ...[
                   TextButton(
                     onPressed: () => context.push('/register/student'),

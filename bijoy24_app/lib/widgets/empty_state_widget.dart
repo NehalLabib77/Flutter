@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
-/// Modern empty state with illustration-like icon
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
   final String title;

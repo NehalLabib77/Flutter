@@ -86,7 +86,7 @@ class _RoomChangeScreenState extends ConsumerState<RoomChangeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Submit form
+
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -136,7 +136,6 @@ class _RoomChangeScreenState extends ConsumerState<RoomChangeScreen> {
             ),
             const SizedBox(height: 24),
 
-            // History
             const Text(
               'Request History',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

@@ -44,7 +44,6 @@ class ApiService {
 
   Dio get dio => _dio;
 
-  // ===== AUTH =====
   Future<Response> studentLogin(String username, String password) {
     return _dio.post(
       ApiEndpoints.studentLogin,
@@ -67,7 +66,6 @@ class ApiService {
     return _dio.post(ApiEndpoints.hallAdminRegister, data: data);
   }
 
-  // ===== STUDENT =====
   Future<Response> getStudentDashboard() {
     return _dio.get(ApiEndpoints.studentDashboard);
   }
@@ -120,7 +118,6 @@ class ApiService {
     return _dio.post(ApiEndpoints.studentMaintenance, data: data);
   }
 
-  // ===== HALLS & ROOMS (shared) =====
   Future<Response> getHalls() {
     return _dio.get(ApiEndpoints.halls);
   }
@@ -133,7 +130,6 @@ class ApiService {
     return _dio.get(ApiEndpoints.roomSeats(roomId, hallId));
   }
 
-  // ===== HALL ADMIN =====
   Future<Response> getHallAdminDashboard() {
     return _dio.get(ApiEndpoints.hallAdminDashboard);
   }
@@ -202,7 +198,6 @@ class ApiService {
     return _dio.put(ApiEndpoints.hallAdminRoomChangeRequest(id), data: data);
   }
 
-  // ===== SYSTEM ADMIN =====
   Future<Response> getAdminDashboard() {
     return _dio.get(ApiEndpoints.adminDashboard);
   }

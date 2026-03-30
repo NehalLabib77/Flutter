@@ -5,12 +5,10 @@ class AppStrings {
   static const String appTitle = 'BIJOY-24 Hall Management';
   static const String appSubtitle = 'Residential Hall Management System';
 
-  // Roles
   static const String roleStudent = 'Student';
   static const String roleHallAdmin = 'HallAdmin';
   static const String roleSystemAdmin = 'SystemAdmin';
 
-  // Auth
   static const String login = 'Login';
   static const String register = 'Register';
   static const String studentLogin = 'Student Login';
@@ -23,7 +21,6 @@ class AppStrings {
   static const String forgotPassword = 'Forgot Password?';
   static const String logout = 'Logout';
 
-  // Student
   static const String studentId = 'Student ID';
   static const String boarderNo = 'Boarder Number';
   static const String fullName = 'Full Name';
@@ -40,13 +37,11 @@ class AppStrings {
   static const String motherName = "Mother's Name";
   static const String religion = 'Religion';
 
-  // Hall
   static const String hallName = 'Hall Name';
   static const String hallType = 'Hall Type';
   static const String hallCapacity = 'Hall Capacity';
   static const String location = 'Location';
 
-  // Room
   static const String roomNumber = 'Room Number';
   static const String wing = 'Wing';
   static const String block = 'Block';
@@ -54,7 +49,6 @@ class AppStrings {
   static const String capacity = 'Capacity';
   static const String availableSlots = 'Available Slots';
 
-  // Status
   static const String statusPending = 'Pending';
   static const String statusApproved = 'Approved';
   static const String statusRejected = 'Rejected';
@@ -70,23 +64,19 @@ class AppStrings {
   static const String statusCancelled = 'Cancelled';
   static const String statusExpired = 'Expired';
 
-  // Seat Types
   static const String windowLeft = 'WINDOW_LEFT';
   static const String windowRight = 'WINDOW_RIGHT';
   static const String doorLeft = 'DOOR_LEFT';
   static const String doorRight = 'DOOR_RIGHT';
 
-  // Priorities
   static const String priorityLow = 'Low';
   static const String priorityMedium = 'Medium';
   static const String priorityHigh = 'High';
   static const String priorityUrgent = 'Urgent';
 
-  // Gender
   static const String male = 'MALE';
   static const String female = 'FEMALE';
 
-  // Error Messages
   static const String errorRequired = 'This field is required';
   static const String errorInvalidEmail = 'Please enter a valid email';
   static const String errorPasswordMismatch = 'Passwords do not match';
@@ -98,7 +88,6 @@ class AppStrings {
   static const String errorServerError =
       'Server error. Please try again later.';
 
-  // Success Messages
   static const String successRegistration =
       'Registration successful! Please login.';
   static const String successApplicationSubmitted =
@@ -109,7 +98,6 @@ class AppStrings {
       'Room change request submitted.';
   static const String successProfileUpdated = 'Profile updated successfully.';
 
-  // Faculties
   static const List<String> faculties = [
     'Engineering',
     'Science',
@@ -121,7 +109,6 @@ class AppStrings {
     'Agriculture',
   ];
 
-  // Blood Groups
   static const List<String> bloodGroups = [
     'A+',
     'A-',

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
-/// Modern gradient stat card for dashboards
 class StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -11,7 +10,7 @@ class StatCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   static const _defaultShadow = BoxShadow(
-    color: Color(0x0F1A237E), // primary at ~6% opacity
+    color: Color(0x0F1A237E),
     blurRadius: 16,
     offset: Offset(0, 4),
   );
@@ -79,7 +78,6 @@ class StatCard extends StatelessWidget {
   }
 }
 
-/// Compact inline stat chip for quick info
 class StatChip extends StatelessWidget {
   final IconData icon;
   final String label;

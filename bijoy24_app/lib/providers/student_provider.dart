@@ -7,7 +7,6 @@ import '../models/room_change_request.dart';
 import '../models/maintenance_request.dart';
 import '../services/api_service.dart';
 
-// Student Profile
 class StudentProfileNotifier extends StateNotifier<AsyncValue<Student?>> {
   final ApiService _api = ApiService();
 
@@ -39,7 +38,6 @@ final studentProfileProvider =
       return StudentProfileNotifier();
     });
 
-// Room Assignment
 class RoomAssignmentNotifier
     extends StateNotifier<AsyncValue<RoomAssignment?>> {
   final ApiService _api = ApiService();
@@ -68,7 +66,6 @@ final roomAssignmentProvider =
       return RoomAssignmentNotifier();
     });
 
-// Room Application Status
 class RoomApplicationNotifier
     extends StateNotifier<AsyncValue<RoomApplication?>> {
   final ApiService _api = ApiService();
@@ -108,7 +105,6 @@ final roomApplicationProvider =
       return RoomApplicationNotifier();
     });
 
-// Seat Application Status
 class SeatApplicationNotifier
     extends StateNotifier<AsyncValue<SeatApplication?>> {
   final ApiService _api = ApiService();
@@ -148,7 +144,6 @@ final seatApplicationProvider =
       return SeatApplicationNotifier();
     });
 
-// Roommates
 class RoommatesNotifier extends StateNotifier<AsyncValue<List<Student>>> {
   final ApiService _api = ApiService();
 
@@ -173,7 +168,6 @@ final roommatesProvider =
       return RoommatesNotifier();
     });
 
-// Room Change Requests
 class RoomChangeNotifier
     extends StateNotifier<AsyncValue<List<RoomChangeRequest>>> {
   final ApiService _api = ApiService();
@@ -212,7 +206,6 @@ final roomChangeProvider =
       return RoomChangeNotifier();
     });
 
-// Maintenance Requests
 class MaintenanceNotifier
     extends StateNotifier<AsyncValue<List<MaintenanceRequest>>> {
   final ApiService _api = ApiService();

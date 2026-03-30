@@ -66,7 +66,6 @@ class _EditRoomScreenState extends ConsumerState<EditRoomScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(hallAdminRoomsProvider);
 
-    // Try to init when data is available
     state.whenData((_) => _initFromRoom());
 
     return Scaffold(

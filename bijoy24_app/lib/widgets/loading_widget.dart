@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
-/// Elegant shimmer loading placeholder
 class LoadingWidget extends StatelessWidget {
   final String? message;
   const LoadingWidget({super.key, this.message});
@@ -35,7 +34,6 @@ class LoadingWidget extends StatelessWidget {
   }
 }
 
-/// Error state with retry — modern card style
 class ErrorRetryWidget extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;

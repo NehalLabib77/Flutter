@@ -1,16 +1,13 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  // Base URL - Change this to your actual backend URL
   static const String baseUrl = 'http://10.0.2.2:5000/api';
 
-  // Auth
   static const String studentLogin = '/auth/student/login';
   static const String adminLogin = '/auth/admin/login';
   static const String studentRegister = '/auth/student/register';
   static const String hallAdminRegister = '/auth/halladmin/register';
 
-  // Student
   static const String studentDashboard = '/student/dashboard';
   static const String studentProfile = '/student/profile';
   static const String studentRoomAssignment = '/student/room-assignment';
@@ -25,13 +22,11 @@ class ApiEndpoints {
   static const String studentRoomChangeHistory = '/student/room-change/history';
   static const String studentMaintenance = '/student/maintenance';
 
-  // Halls & Rooms (shared)
   static const String halls = '/halls';
   static String hallRooms(int hallId) => '/halls/$hallId/rooms';
   static String roomSeats(String roomId, int hallId) =>
       '/rooms/$roomId/seats?hallId=$hallId';
 
-  // Hall Admin
   static const String hallAdminDashboard = '/halladmin/dashboard';
   static const String hallAdminRoomApplications =
       '/halladmin/applications/rooms';
@@ -57,7 +52,6 @@ class ApiEndpoints {
   static String hallAdminRoomChangeRequest(int id) =>
       '/halladmin/room-change-requests/$id';
 
-  // System Admin
   static const String adminDashboard = '/admin/dashboard';
   static const String adminHalls = '/admin/halls';
   static String adminHall(int id) => '/admin/halls/$id';

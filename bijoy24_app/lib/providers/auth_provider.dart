@@ -4,7 +4,6 @@ import '../models/user.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
 
-// Auth state
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 
 class AuthState {
@@ -60,7 +59,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await StorageService.saveUser(user);
       state = AuthState(status: AuthStatus.authenticated, user: user);
     } catch (e) {
-      // Fall back to mock login when backend is unavailable
+
       if (_isNetworkUnavailable(e)) {
         final mockUser = _mockStudentLogin(username, password);
         if (mockUser != null) {
@@ -86,7 +85,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await StorageService.saveUser(user);
       state = AuthState(status: AuthStatus.authenticated, user: user);
     } catch (e) {
-      // Fall back to mock login when backend is unavailable
+
       if (_isNetworkUnavailable(e)) {
         final mockUser = _mockAdminLogin(username, password, role);
         if (mockUser != null) {
@@ -150,7 +149,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return false;
   }
 
-  // Mock credentials used when backend is not running
   AuthUser? _mockStudentLogin(String username, String password) {
     if (username == 'student' && password == 'student123') {
       return AuthUser(

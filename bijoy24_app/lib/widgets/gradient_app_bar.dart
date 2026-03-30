@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../constants/app_colors.dart';
 
-/// A consistent gradient AppBar used across all sub-screens.
-/// Matches the gradient header style on all three dashboards.
 class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget>? actions;

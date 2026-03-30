@@ -143,7 +143,6 @@ class _StudentRegistrationScreenState
                 keyboard: TextInputType.phone,
               ),
 
-              // Gender
               const SizedBox(height: 12),
               const Text(
                 'Gender',
@@ -156,7 +155,6 @@ class _StudentRegistrationScreenState
                 ],
               ),
 
-              // Blood Group
               DropdownButtonFormField<String>(
                 initialValue: _bloodGroup,
                 decoration: const InputDecoration(
@@ -169,7 +167,6 @@ class _StudentRegistrationScreenState
               ),
               const SizedBox(height: 12),
 
-              // Faculty
               DropdownButtonFormField<String>(
                 initialValue: _faculty,
                 decoration: const InputDecoration(
@@ -183,7 +180,6 @@ class _StudentRegistrationScreenState
               ),
               const SizedBox(height: 12),
 
-              // Semester
               DropdownButtonFormField<int>(
                 initialValue: _semester,
                 decoration: const InputDecoration(
@@ -216,7 +212,6 @@ class _StudentRegistrationScreenState
               _buildField(_fatherCtrl, AppStrings.fatherName),
               _buildField(_motherCtrl, AppStrings.motherName),
 
-              // Religion
               DropdownButtonFormField<String>(
                 initialValue: _religion,
                 decoration: const InputDecoration(
@@ -240,7 +235,6 @@ class _StudentRegistrationScreenState
               const SizedBox(height: 20),
               const _SectionHeader('Hall Selection'),
 
-              // Hall Dropdown
               hallsState.when(
                 data: (halls) {
                   final filtered = halls

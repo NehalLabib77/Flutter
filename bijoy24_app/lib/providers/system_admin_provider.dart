@@ -5,7 +5,6 @@ import '../models/boarder_registry.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 
-// System Admin Dashboard
 class SysAdminDashboardNotifier
     extends StateNotifier<AsyncValue<DashboardStats>> {
   final ApiService _api = ApiService();
@@ -42,7 +41,6 @@ final sysAdminDashboardProvider =
       return SysAdminDashboardNotifier();
     });
 
-// Halls
 class SysAdminHallsNotifier extends StateNotifier<AsyncValue<List<Hall>>> {
   final ApiService _api = ApiService();
 
@@ -128,7 +126,6 @@ final sysAdminHallsProvider =
       return SysAdminHallsNotifier();
     });
 
-// Hall Admins
 class SysAdminHallAdminsNotifier
     extends StateNotifier<AsyncValue<List<HallAdmin>>> {
   final ApiService _api = ApiService();
@@ -230,7 +227,6 @@ final sysAdminHallAdminsProvider =
       return SysAdminHallAdminsNotifier();
     });
 
-// Boarder Registry
 class BoarderRegistryNotifier
     extends StateNotifier<AsyncValue<List<BoarderRegistry>>> {
   final ApiService _api = ApiService();
@@ -352,7 +348,6 @@ final boarderRegistryProvider =
       return BoarderRegistryNotifier();
     });
 
-// Admin Stats
 class AdminStatsNotifier extends StateNotifier<AsyncValue<DashboardStats>> {
   final ApiService _api = ApiService();
 

@@ -50,7 +50,7 @@ class SeatLayoutWidget extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Window side label
+
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 6),
@@ -75,7 +75,7 @@ class SeatLayoutWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // Window seats row
+
           Row(
             children: [
               Expanded(
@@ -94,7 +94,7 @@ class SeatLayoutWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Divider
+
           if (roomNumber != null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
@@ -107,7 +107,7 @@ class SeatLayoutWidget extends StatelessWidget {
               ),
             ),
           const SizedBox(height: 12),
-          // Door seats row
+
           Row(
             children: [
               Expanded(
@@ -123,7 +123,7 @@ class SeatLayoutWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Door side label
+
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 6),
@@ -152,7 +152,7 @@ class SeatLayoutWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // Legend
+
           Wrap(
             spacing: 12,
             runSpacing: 4,

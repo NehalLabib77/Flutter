@@ -45,9 +45,9 @@ class _HallAdminHomeScreenState extends ConsumerState<HallAdminHomeScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // gradient header
+
           SliverToBoxAdapter(child: _buildHeader(context, auth)),
-          // stats grid
+
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
             sliver: state.when(
@@ -95,7 +95,7 @@ class _HallAdminHomeScreenState extends ConsumerState<HallAdminHomeScreen> {
               ),
             ),
           ),
-          // Quick actions
+
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
             sliver: SliverToBoxAdapter(
@@ -164,13 +164,11 @@ class _HallAdminHomeScreenState extends ConsumerState<HallAdminHomeScreen> {
                 ),
                 IconButton(
                   onPressed: () async {
-                    // Logout and clear auth state
+
                     await ref.read(authProvider.notifier).logout();
-                    
-                    // Give a small delay to ensure state is updated
+
                     await Future.delayed(const Duration(milliseconds: 100));
-                    
-                    // Navigate to login page
+
                     if (context.mounted) {
                       context.go('/login');
                     }

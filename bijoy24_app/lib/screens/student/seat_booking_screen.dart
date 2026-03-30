@@ -99,7 +99,7 @@ class _SeatBookingScreenState extends ConsumerState<SeatBookingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Hall selection
+
             hallsState.when(
               data: (halls) => DropdownButtonFormField<int>(
                 initialValue: _selectedHallId,
@@ -127,7 +127,6 @@ class _SeatBookingScreenState extends ConsumerState<SeatBookingScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Room selection
             if (_selectedHallId != null)
               roomsState.when(
                 data: (rooms) {
@@ -162,7 +161,6 @@ class _SeatBookingScreenState extends ConsumerState<SeatBookingScreen> {
               ),
             const SizedBox(height: 24),
 
-            // Seat Layout
             if (_selectedRoomId != null)
               seatsState.when(
                 data: (seats) {

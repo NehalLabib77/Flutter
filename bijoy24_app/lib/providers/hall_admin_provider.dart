@@ -9,7 +9,6 @@ import '../models/maintenance_request.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 
-// ─── Network error helper ────────────────────────────────────────────────────
 bool _isNetworkError(dynamic e) {
   if (e is DioException) {
     return e.type == DioExceptionType.connectionTimeout ||
@@ -17,10 +16,9 @@ bool _isNetworkError(dynamic e) {
         e.type == DioExceptionType.receiveTimeout ||
         e.type == DioExceptionType.sendTimeout;
   }
-  return true; // treat all errors as network errors in mock mode
+  return true;
 }
 
-// ─── Mock Data ───────────────────────────────────────────────────────────────
 DashboardStats _mockDashboardStats() => DashboardStats(
   totalHalls: 1,
   totalRooms: 24,
@@ -350,7 +348,6 @@ List<MaintenanceRequest> _mockMaintenance() => [
   ),
 ];
 
-// ─── Hall Admin Dashboard ────────────────────────────────────────────────────
 class HallAdminDashboardNotifier
     extends StateNotifier<AsyncValue<DashboardStats>> {
   final ApiService _api = ApiService();
@@ -380,7 +377,6 @@ final hallAdminDashboardProvider =
       return HallAdminDashboardNotifier();
     });
 
-// ─── Room Applications ───────────────────────────────────────────────────────
 class HallAdminRoomAppsNotifier
     extends StateNotifier<AsyncValue<List<RoomApplication>>> {
   final ApiService _api = ApiService();
@@ -449,7 +445,6 @@ final hallAdminRoomAppsProvider =
       AsyncValue<List<RoomApplication>>
     >((ref) => HallAdminRoomAppsNotifier());
 
-// ─── Seat Applications ───────────────────────────────────────────────────────
 class HallAdminSeatAppsNotifier
     extends StateNotifier<AsyncValue<List<SeatApplication>>> {
   final ApiService _api = ApiService();
@@ -518,7 +513,6 @@ final hallAdminSeatAppsProvider =
       AsyncValue<List<SeatApplication>>
     >((ref) => HallAdminSeatAppsNotifier());
 
-// ─── Rooms ───────────────────────────────────────────────────────────────────
 class HallAdminRoomsNotifier extends StateNotifier<AsyncValue<List<Room>>> {
   final ApiService _api = ApiService();
   bool _mockMode = false;
@@ -629,7 +623,6 @@ final hallAdminRoomsProvider =
       (ref) => HallAdminRoomsNotifier(),
     );
 
-// ─── Room Assignments ─────────────────────────────────────────────────────────
 class HallAdminAssignmentsNotifier
     extends StateNotifier<AsyncValue<List<RoomAssignment>>> {
   final ApiService _api = ApiService();
@@ -680,7 +673,6 @@ final hallAdminAssignmentsProvider =
       AsyncValue<List<RoomAssignment>>
     >((ref) => HallAdminAssignmentsNotifier());
 
-// ─── Room Change Requests ─────────────────────────────────────────────────────
 class HallAdminRoomChangeNotifier
     extends StateNotifier<AsyncValue<List<RoomChangeRequest>>> {
   final ApiService _api = ApiService();
@@ -751,7 +743,6 @@ final hallAdminRoomChangeProvider =
       AsyncValue<List<RoomChangeRequest>>
     >((ref) => HallAdminRoomChangeNotifier());
 
-// ─── Maintenance Requests ─────────────────────────────────────────────────────
 class HallAdminMaintenanceNotifier
     extends StateNotifier<AsyncValue<List<MaintenanceRequest>>> {
   final ApiService _api = ApiService();

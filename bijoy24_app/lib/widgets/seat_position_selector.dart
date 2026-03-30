@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
-/// Enum for seat positions in a room (4 positions based on door and window locations)
 enum SeatPosition {
   leftDoor('Left Door', Icons.door_back_door_rounded, 'DOOR_LEFT'),
   rightDoor('Right Door', Icons.door_back_door_rounded, 'DOOR_RIGHT'),
@@ -14,10 +13,8 @@ enum SeatPosition {
 
   const SeatPosition(this.label, this.icon, this.apiValue);
 
-  /// Get a display name for the position
   String get displayName => label;
 
-  /// Convert string to enum (from API value)
   static SeatPosition? fromString(String? value) {
     if (value == null) return null;
     try {
@@ -29,12 +26,9 @@ enum SeatPosition {
     }
   }
 
-  /// Convert to API value for backend
   String toApiValue() => apiValue;
 }
 
-/// A widget that displays 4 selectable seat positions
-/// Shows positions in a 2x2 grid: left door, right door, left window, right window
 class SeatPositionSelector extends StatelessWidget {
   final SeatPosition? selectedPosition;
   final ValueChanged<SeatPosition> onSelect;
@@ -87,7 +81,6 @@ class SeatPositionSelector extends StatelessWidget {
   }
 }
 
-/// Individual tile for a seat position
 class _SeatPositionTile extends StatelessWidget {
   final SeatPosition position;
   final bool isSelected;

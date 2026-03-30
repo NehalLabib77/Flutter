@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
-/// Modern pill-shaped status badge
 class StatusBadge extends StatelessWidget {
   final String status;
   final double fontSize;
@@ -30,7 +29,6 @@ class StatusBadge extends StatelessWidget {
   }
 }
 
-/// Priority badge with icon
 class PriorityBadge extends StatelessWidget {
   final String priority;
 
